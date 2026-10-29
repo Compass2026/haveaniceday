@@ -1,0 +1,16 @@
+---
+// Status line under a form. Forms post to the endpoint in data-endpoint.
+// With no endpoint configured (see src/data/site.ts) they say so plainly
+// instead of pretending to send.
+interface Props {
+  ok: string;
+}
+const { ok } = Astro.props;
+---
+
+<p class="form-note" role="status" aria-live="polite" data-form-note data-ok={ok}></p>
+
+<script>
+  import { initForms } from '../scripts/forms';
+  initForms();
+</script>

@@ -1,0 +1,150 @@
+---
+import { Image } from 'astro:assets';
+import { logo } from '../data/moments';
+---
+
+<section class="pod night" aria-labelledby="pod-title">
+  <div class="wrap pod__grid">
+    <div class="pod__badge">
+      <!-- The supplied podcast logo, shown as-is -->
+      <Image
+        class="sticker pod__logo"
+        src={logo}
+        alt="Had A Nice Day Podcast Show with Ron LaBeau logo: HANDY in headphones at a microphone, giving a peace sign."
+        widths={[360, 600, 900]}
+        sizes="(max-width: 860px) 78vw, 36vw"
+        format="webp"
+        loading="lazy"
+      />
+    </div>
+    <div class="pod__copy">
+      <p class="eyebrow">
+        <span class="pod__bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        The podcast
+      </p>
+      <h2 class="h-lg" id="pod-title">Pull up a chair. <span class="say">Tell us about your day.</span></h2>
+      <p class="lede">
+        On the Had A Nice Day Podcast Show, Ron sits down with riders, golfers, bakers, runners and neighbors to talk
+        about the days they remember and how they made room for them. Expect good stories, a few laughs, and probably
+        an idea for your next Saturday.
+      </p>
+      <ul class="pod__list">
+        <li><b>Out there.</b> Long rides, early tee times, back roads, county fairs.</li>
+        <li><b>Close to home.</b> Kitchens, porches, back yards and quiet hours.</li>
+        <li><b>Making the time.</b> How busy people protect the stuff that matters.</li>
+      </ul>
+      <div class="pod__ctas">
+        <a class="btn btn--orange" href="/podcast">Explore the podcast</a>
+        <a class="btn btn--light" href="/podcast#be-a-guest">Be a guest</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pod {
+    background: var(--ink);
+    padding-block: clamp(3rem, 6vw, 6rem) var(--section);
+  }
+  .pod__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5.5rem);
+    align-items: center;
+  }
+  .pod__logo {
+    width: min(100%, 520px);
+    --tilt: -4deg;
+  }
+  .pod__badge:hover .pod__logo {
+    --tilt: 0deg;
+  }
+  .pod__copy {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .pod__copy .say {
+    display: block;
+    color: var(--orange);
+  }
+  .pod__bars {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 16px;
+  }
+  .pod__copy .eyebrow::before {
+    display: none;
+  }
+  .pod__bars i {
+    width: 3px;
+    border-radius: 2px;
+    background: currentColor;
+    height: 40%;
+  }
+  .pod__bars i:nth-child(2) {
+    height: 100%;
+  }
+  .pod__bars i:nth-child(3) {
+    height: 65%;
+  }
+  .pod__bars i:nth-child(4) {
+    height: 85%;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .pod__bars i {
+      animation: bar 1.1s ease-in-out infinite alternate;
+    }
+    .pod__bars i:nth-child(2) {
+      animation-delay: -0.4s;
+    }
+    .pod__bars i:nth-child(3) {
+      animation-delay: -0.8s;
+    }
+    .pod__bars i:nth-child(4) {
+      animation-delay: -0.2s;
+    }
+    .pod__bars i:nth-child(5) {
+      animation-delay: -0.6s;
+    }
+  }
+  @keyframes bar {
+    to {
+      transform: scaleY(0.45);
+    }
+  }
+  .pod__list {
+    display: grid;
+    gap: 0.8rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgb(246 239 225 / 0.16);
+  }
+  .pod__list li {
+    padding-top: 0.8rem;
+    color: var(--on-night-2);
+  }
+  .pod__list li + li {
+    border-top: 1px solid rgb(246 239 225 / 0.1);
+  }
+  .pod__list b {
+    color: var(--on-night);
+  }
+  .pod__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  @media (max-width: 860px) {
+    .pod__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pod__badge {
+      display: flex;
+      justify-content: center;
+    }
+    .pod__logo {
+      width: min(78vw, 380px);
+    }
+  }
+</style>

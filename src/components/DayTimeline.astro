@@ -1,0 +1,408 @@
+---
+import { Image } from 'astro:assets';
+import { day, dayMinutes, paceLabel } from '../data/moments';
+
+// Sun angle on the dial: 6:00 AM rises at 0deg, 6:00 PM sets at 180deg.
+// Anything after dark sits below the horizon and the moon takes over.
+const angle = (t: string) => Math.max(-8, Math.min(196, ((dayMinutes(t) - 360) / 720) * 180));
+const isDark = (fg: string) => fg.toLowerCase() === '#f6efe1';
+---
+
+<section class="day" data-day aria-labelledby="day-title">
+  <div class="wrap day__intro">
+    <p class="eyebrow">A day, on purpose</p>
+    <h2 class="h-lg" id="day-title">Big adventures and small ones <span class="say">count the same.</span></h2>
+    <p class="lede">
+      A sunrise run. Nine holes with friends. Cookies with the grandkids. A quiet hour before bed. Here’s one way a
+      nice day can go, and the designs that came out of it.
+    </p>
+  </div>
+
+  <div class="wrap day__grid">
+    <div class="day__clock" aria-hidden="true">
+      <svg class="day__dial" viewBox="0 0 200 112">
+        <defs>
+          <clipPath id="above-horizon"><rect x="0" y="0" width="200" height="101"></rect></clipPath>
+        </defs>
+        <path class="day__arc" d="M10 100 A90 90 0 0 1 190 100"></path>
+        <g clip-path="url(#above-horizon)">
+          <g class="day__sun-orbit" data-day-orbit style="--angle:0deg">
+            <circle class="day__sun" cx="10" cy="100" r="11"></circle>
+          </g>
+        </g>
+        <line class="day__ground" x1="0" y1="101" x2="200" y2="101"></line>
+        <circle class="day__moon" cx="160" cy="34" r="10"></circle>
+        <circle class="day__moon-bite" cx="165" cy="30" r="9"></circle>
+      </svg>
+      <p class="day__time" data-day-time>{day[0]?.time}</p>
+      <p class="day__pace" data-day-pace>{day[0] && paceLabel[day[0].pace]}</p>
+    </div>
+
+    <ol class="day__list">
+      {
+        day.map((m, i) => (
+          <li
+            class:list={['day__entry', `day__entry--${i % 2 ? 'b' : 'a'}`, { 'is-cut': !m.complete }]}
+            data-day-entry
+            data-bg={m.tone!.bg}
+            data-fg={m.tone!.fg}
+            data-dark={isDark(m.tone!.fg) ? 'true' : 'false'}
+            data-time={m.time}
+            data-pace={paceLabel[m.pace]}
+            data-angle={angle(m.time!)}
+          >
+            <figure class="day__figure">
+              <Image
+                class="day__img"
+                src={m.image!}
+                alt={m.alt}
+                widths={[420, 640, 900, 1200]}
+                sizes="(max-width: 860px) 88vw, 40vw"
+                format="webp"
+                quality={80}
+                loading="lazy"
+              />
+            </figure>
+            <div class="day__text">
+              <p class="day__stamp">
+                <time>{m.time}</time>
+                <span class={`pace pace--${m.pace}`}>{paceLabel[m.pace]}</span>
+              </p>
+              <h3 class="day__h">{m.name}</h3>
+              <p class="day__line">{m.line}</p>
+              <a class="link-arrow" href={`/shop#${m.slug}`}>
+                Wear this one
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="day__end night" data-day-end>
+    <div class="wrap">
+      <p class="day__end-pre say">And then, finally, you get to say it.</p>
+      <p class="day__end-big">I had a nice day<span>.</span></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .day {
+    --day-bg: var(--paper);
+    --day-fg: var(--ink);
+    background: var(--day-bg);
+    color: var(--day-fg);
+    padding-top: var(--section);
+    transition:
+      background-color 0.9s ease,
+      color 0.9s ease;
+  }
+  .day__intro {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: clamp(3rem, 6vw, 6rem);
+  }
+  .day__intro h2 {
+    max-width: 12em;
+  }
+  .day__intro .say {
+    color: var(--blue);
+  }
+  .day[data-dark] .day__intro .say {
+    color: var(--sun);
+  }
+  .day__intro .lede {
+    color: inherit;
+    opacity: 0.85;
+  }
+
+  .day__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3.2fr) minmax(0, 8.8fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  /* Sticky sun dial */
+  .day__clock {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + 2rem);
+    display: grid;
+    gap: 0.4rem;
+  }
+  .day__dial {
+    width: 100%;
+    max-width: 220px;
+    overflow: visible;
+  }
+  .day__arc {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-dasharray: 2 5;
+    opacity: 0.55;
+  }
+  .day__ground {
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .day__sun-orbit {
+    transform-box: view-box;
+    transform-origin: 100px 100px;
+    transform: rotate(var(--angle));
+    transition: transform 1s cubic-bezier(0.45, 0, 0.2, 1);
+  }
+  .day__sun {
+    fill: var(--orange);
+  }
+  .day__moon {
+    fill: var(--paper);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .day__moon-bite {
+    fill: var(--day-bg);
+    opacity: 0;
+    transition:
+      opacity 0.6s ease,
+      fill 0.9s ease;
+  }
+  .day[data-dark] .day__moon,
+  .day[data-dark] .day__moon-bite {
+    opacity: 1;
+  }
+  .day__time {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 1.6rem + 3vw, 4.6rem);
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .day__pace {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  /* Entries */
+  .day__list {
+    display: grid;
+    gap: clamp(4rem, 9vw, 9rem);
+    padding-bottom: clamp(4rem, 9vw, 8rem);
+  }
+  .day__entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 3rem);
+    align-items: center;
+  }
+  .day__entry--b {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  }
+  .day__entry--b .day__figure {
+    order: 2;
+  }
+  .day__entry--a:nth-child(4n + 1) {
+    margin-right: 6%;
+  }
+  .day__entry--b:nth-child(4n + 2) {
+    margin-left: 8%;
+  }
+  .day__figure {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  .day__img {
+    width: 100%;
+    max-height: min(68vh, 560px);
+    object-fit: contain;
+    filter: drop-shadow(0 16px 22px rgb(13 27 61 / 0.2));
+    transform: rotate(var(--tilt, -2deg));
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .day__entry--b .day__img {
+    --tilt: 2deg;
+  }
+  .day__entry:hover .day__img {
+    --tilt: 0deg;
+  }
+  /* Artwork cut off at the bottom in the supplied file sits on a ledge */
+  .day__entry.is-cut .day__figure {
+    border-bottom: 3px solid currentColor;
+  }
+  .day__entry.is-cut .day__img {
+    --tilt: 0deg;
+    filter: none;
+    width: 100%;
+    margin-bottom: -1px;
+  }
+  .day[data-dark] .day__img {
+    filter: drop-shadow(0 18px 24px rgb(0 0 0 / 0.4));
+  }
+  .day[data-dark] .day__entry.is-cut .day__img {
+    filter: none;
+  }
+
+  .day__text {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    max-width: 26rem;
+  }
+  .day__stamp {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem 0.9rem;
+  }
+  .day__stamp time {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .day__h {
+    font-size: var(--step-3);
+    line-height: 1;
+  }
+  .day__line {
+    font-size: var(--step-1);
+    line-height: 1.5;
+  }
+  .day[data-dark] .link-arrow {
+    color: var(--sun);
+  }
+  .day[data-dark] .pace {
+    color: var(--on-night);
+  }
+
+  .day__end {
+    padding-block: clamp(3rem, 6vw, 6rem) clamp(1rem, 2vw, 2rem);
+    background: var(--ink);
+    transition: background-color 0.9s ease;
+  }
+  .day__end-pre {
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.4rem);
+    color: var(--sun);
+  }
+  .day__end-big {
+    margin-top: 0.4rem;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(3rem, 1rem + 9vw, 10rem);
+    letter-spacing: -0.055em;
+    line-height: 0.88;
+    font-variation-settings: 'opsz' 96;
+    text-wrap: balance;
+  }
+  .day__end-big span {
+    color: var(--orange);
+  }
+
+  @media (max-width: 860px) {
+    .day__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    .day__clock {
+      top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
+      z-index: 5;
+      grid-template-columns: 64px auto 1fr;
+      align-items: center;
+      gap: 0.9rem;
+      margin-inline: calc(-1 * max(var(--gutter), env(safe-area-inset-left, 0px)));
+      padding: 0.6rem max(var(--gutter), env(safe-area-inset-left, 0px));
+      background: var(--day-bg);
+      border-bottom: 1px solid currentColor;
+      margin-bottom: 2.5rem;
+      transition: background-color 0.9s ease;
+    }
+    .day__dial {
+      width: 64px;
+    }
+    .day__time {
+      font-size: 1.6rem;
+    }
+    .day__pace {
+      justify-self: end;
+      font-size: 0.7rem;
+    }
+    .day__entry,
+    .day__entry--b {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 0 !important;
+    }
+    .day__entry--b .day__figure {
+      order: 0;
+    }
+    .day__img {
+      max-height: 58vh;
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector<HTMLElement>('[data-day]');
+  if (section) {
+    const entries = [...section.querySelectorAll<HTMLElement>('[data-day-entry]')];
+    const time = section.querySelector<HTMLElement>('[data-day-time]')!;
+    const pace = section.querySelector<HTMLElement>('[data-day-pace]')!;
+    const orbit = section.querySelector<SVGGElement>('[data-day-orbit]')!;
+    const end = section.querySelector<HTMLElement>('[data-day-end]');
+
+    const apply = (el: HTMLElement) => {
+      const d = el.dataset;
+      section.style.setProperty('--day-bg', d.bg!);
+      section.style.setProperty('--day-fg', d.fg!);
+      section.toggleAttribute('data-dark', d.dark === 'true');
+      time.textContent = d.time!;
+      pace.textContent = d.pace!;
+      orbit.style.setProperty('--angle', `${d.angle}deg`);
+    };
+
+    // The entry crossing the middle of the screen sets the time of day.
+    const io = new IntersectionObserver(
+      (list) => {
+        list.forEach((entry) => {
+          if (entry.isIntersecting) apply(entry.target as HTMLElement);
+        });
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    entries.forEach((el) => io.observe(el));
+    if (entries[0]) apply(entries[0]);
+
+    // Scrolling back above the section resets it to morning.
+    new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting && entry.boundingClientRect.top > 0 && entries[0]) apply(entries[0]);
+      },
+      { threshold: 0 },
+    ).observe(section);
+
+    if (end) {
+      new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            const last = entries[entries.length - 1];
+            if (last) apply(last);
+          }
+        },
+        { rootMargin: '0px 0px -30% 0px' },
+      ).observe(end);
+    }
+  }
+</script>

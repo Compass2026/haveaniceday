@@ -1,0 +1,447 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import FormNote from '../components/FormNote.astro';
+import { bySlug, logo } from '../data/moments';
+import { site } from '../data/site';
+
+const topics = [
+  {
+    art: bySlug('03-motorcycle') ?? bySlug('05-sports-car'),
+    title: 'Out there',
+    body: 'Long rides, early tee times, back roads and county fairs. The adventures people plan all week for, and the ones they didn’t plan at all.',
+  },
+  {
+    art: bySlug('12-baking-cookies') ?? bySlug('09-bronze-singing-bowls'),
+    title: 'Close to home',
+    body: 'Kitchens, porches, back yards and quiet hours. Small moments with family and friends that turn out to be the ones you remember.',
+  },
+  {
+    art: bySlug('11-jogging') ?? bySlug('02-peace-sign'),
+    title: 'Making the time',
+    body: 'How busy people protect the stuff that matters. Early alarms, shared calendars, and saying no to one thing so you can say yes to another.',
+  },
+];
+const onAir = bySlug('10-podcast');
+const ronHandy = bySlug('08-ron-and-handy');
+const listen = site.listen;
+const live = listen.filter((l) => l.href);
+---
+
+<Base
+  current="podcast"
+  title="The Podcast"
+  description="The Had A Nice Day Podcast Show with Ron LaBeau: conversations about the days people remember and how they made room for them."
+>
+  <section class="pod-hero night">
+    <div class="wrap pod-hero__grid">
+      <div class="pod-hero__copy">
+        <p class="eyebrow">The podcast</p>
+        <h1 class="pod-hero__title">
+          Had A Nice Day <span>Podcast Show</span>
+          <span class="say">with Ron LaBeau</span>
+        </h1>
+        <p class="lede">
+          Conversations about the days people remember and how they made room for them. Riders, golfers, bakers,
+          runners, neighbors. Everybody has a nice day worth telling, and Ron wants to hear it.
+        </p>
+        <div class="pod-hero__ctas">
+          <a class="btn btn--orange" href="#be-a-guest">Be a guest</a>
+          <a class="btn btn--light" href="#drop-list">Get episode alerts</a>
+        </div>
+      </div>
+      <div class="pod-hero__badge">
+        <Image
+          class="sticker pod-hero__logo"
+          src={logo}
+          alt="Had A Nice Day Podcast Show with Ron LaBeau logo: HANDY in headphones at a microphone, giving a peace sign."
+          widths={[400, 700, 1000]}
+          sizes="(max-width: 860px) 80vw, 40vw"
+          format="webp"
+          loading="eager"
+        />
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="listen">
+        <p class="listen__k">Where to listen</p>
+        {
+          live.length ? (
+            <ul class="listen__list">
+              {live.map((l) => (
+                <li>
+                  <a class="btn btn--light" href={l.href} target="_blank" rel="noopener">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="listen__soon">
+              Listening links go live with episode one. Get on the alerts list and you’ll hear first.
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="topics section" aria-labelledby="topics-title">
+    <div class="wrap">
+      <div class="topics__head">
+        <p class="eyebrow">What we talk about</p>
+        <h2 class="h-lg" id="topics-title">Every kind of nice day <span class="say">gets a seat.</span></h2>
+      </div>
+      <ul class="topics__list">
+        {
+          topics.map((t, i) => (
+            <li class="topics__item" style={`--tilt:${[-3, 3, -2][i]}deg`}>
+              {t.art && (
+                <Image
+                  class="sticker topics__img"
+                  src={t.art.image!}
+                  alt=""
+                  widths={[280, 480, 720]}
+                  sizes="(max-width: 760px) 50vw, 24vw"
+                  format="webp"
+                  loading="lazy"
+                />
+              )}
+              <h3 class="topics__h">{t.title}</h3>
+              <p>{t.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="episodes" aria-labelledby="episodes-title">
+    <div class="wrap episodes__inner">
+      <div class="episodes__light" aria-hidden="true"><span>On air</span></div>
+      <div class="episodes__copy">
+        <h2 class="h-md" id="episodes-title">Episodes are on the way.</h2>
+        <p>
+          When the first ones land, you’ll find them right here with show notes, guests and the designs that came out of
+          each conversation.
+        </p>
+      </div>
+      <a class="btn" href="#drop-list">Tell me when</a>
+    </div>
+  </section>
+
+  <section class="guest section" id="be-a-guest" aria-labelledby="guest-title">
+    <div class="wrap guest__grid">
+      <div class="guest__copy">
+        <p class="eyebrow">Be a guest</p>
+        <h2 class="h-lg" id="guest-title">Had a nice day? <span class="say">Come tell Ron about it.</span></h2>
+        <p class="lede">
+          You don’t need a big adventure or a microphone. You need one good day and the story behind it. Tell us a little,
+          and if it’s a fit for the show, we’ll reach out.
+        </p>
+        {
+          (onAir ?? ronHandy) && (
+            <Image
+              class="sticker guest__art"
+              src={(onAir ?? ronHandy)!.image!}
+              alt={(onAir ?? ronHandy)!.alt}
+              widths={[320, 560]}
+              sizes="280px"
+              format="webp"
+              loading="lazy"
+            />
+          )
+        }
+      </div>
+      <form class="guest__form" data-form data-endpoint={site.forms.guest} novalidate>
+        <div class="guest__row">
+          <div class="field">
+            <label for="guest-name">Your name</label>
+            <input class="input" id="guest-name" name="name" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="guest-email">Email</label>
+            <input class="input" id="guest-email" name="email" type="email" autocomplete="email" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="guest-story">What made it a nice day?</label>
+          <textarea
+            class="input"
+            id="guest-story"
+            name="story"
+            rows="5"
+            placeholder="Last Saturday my granddaughter and I baked three dozen cookies and ate half of them..."
+            required></textarea>
+        </div>
+        <div class="field">
+          <label for="guest-where">Where are you based? <span class="opt">(optional)</span></label>
+          <input class="input" id="guest-where" name="location" autocomplete="address-level2" />
+        </div>
+        <label class="guest__check">
+          <input type="checkbox" name="consent" id="guest-consent" required />
+          <span>It’s okay to contact me about being on the show.</span>
+        </label>
+        <button class="btn" type="submit">Send it to Ron</button>
+        <FormNote ok="Thanks for sharing. We read every one, and we’ll be in touch if it’s a fit." />
+      </form>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .pod-hero {
+    background: var(--ink);
+    padding-block: clamp(2.5rem, 2rem + 4vw, 6rem) clamp(2.5rem, 4vw, 4rem);
+  }
+  :global(body[data-page='podcast'])::before {
+    background: var(--ink);
+  }
+  .pod-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .pod-hero__copy {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .pod-hero__title {
+    font-size: clamp(3rem, 1.2rem + 6.6vw, 7.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.05em;
+  }
+  .pod-hero__title > span:not(.say) {
+    display: block;
+    color: var(--orange);
+  }
+  .pod-hero__title .say {
+    display: block;
+    margin-top: 0.25em;
+    font-size: 0.42em;
+    color: var(--sun);
+  }
+  .pod-hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+  .pod-hero__badge {
+    display: flex;
+    justify-content: center;
+  }
+  .pod-hero__logo {
+    width: min(100%, 540px);
+    --tilt: 3deg;
+  }
+
+  .listen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(246 239 225 / 0.16);
+  }
+  .listen__k {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+  .listen__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .listen__soon {
+    color: var(--on-night-2);
+  }
+
+  .topics__head {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: clamp(2.5rem, 5vw, 5rem);
+  }
+  .topics__head .say {
+    color: var(--blue);
+  }
+  .topics__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 4rem);
+  }
+  .topics__item {
+    display: grid;
+    gap: 0.8rem;
+    align-content: start;
+  }
+  .topics__item:nth-child(2) {
+    margin-top: clamp(0rem, 5vw, 5rem);
+  }
+  .topics__img {
+    width: auto;
+    height: 220px;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+  }
+  .topics__h {
+    font-size: var(--step-3);
+  }
+  .topics__item p {
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+
+  .episodes {
+    padding-bottom: var(--section);
+  }
+  .episodes__inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1.5rem 2.5rem;
+    align-items: center;
+  }
+  .episodes__inner > * {
+    min-width: 0;
+  }
+  .episodes__light {
+    display: grid;
+    place-items: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow:
+      0 0 0 8px var(--paper),
+      0 0 0 10px var(--line-strong);
+  }
+  .episodes__light span {
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    border: 2px solid var(--orange);
+    color: var(--orange);
+    font: 800 0.8rem/1 var(--display);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .episodes__copy {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .episodes__copy p {
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+
+  .guest {
+    background: var(--paper-2);
+  }
+  .guest__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+  .guest__copy {
+    display: grid;
+    gap: 1.4rem;
+  }
+  .guest__copy .say {
+    display: block;
+    color: var(--orange-ink);
+  }
+  .guest__art {
+    width: min(70%, 280px);
+    --tilt: -4deg;
+    margin-top: 1rem;
+  }
+  .guest__form {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.25rem, 3vw, 2.5rem);
+    background: var(--paper);
+    border-radius: 8px;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .guest__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .opt {
+    font-weight: 500;
+  }
+  .guest__check {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .guest__check input {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    accent-color: var(--ink);
+    flex: none;
+  }
+  .guest__form .btn {
+    justify-self: start;
+  }
+
+  @media (max-width: 860px) {
+    .pod-hero__grid,
+    .guest__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pod-hero__badge {
+      order: -1;
+    }
+    .pod-hero__logo {
+      width: min(72vw, 360px);
+    }
+    .pod-hero__title .say {
+      font-size: 0.5em;
+    }
+    .episodes__inner {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+    .episodes__inner .btn {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+  @media (max-width: 760px) {
+    .topics__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .topics__item {
+      grid-template-columns: 120px minmax(0, 1fr);
+      column-gap: 1.25rem;
+      align-items: center;
+    }
+    .topics__item:nth-child(2) {
+      margin-top: 0;
+    }
+    .topics__img {
+      grid-row: span 2;
+      height: 120px;
+      margin: 0;
+    }
+    .episodes__light {
+      width: 84px;
+      height: 84px;
+    }
+    .guest__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,472 @@
+/* Had A Nice Day
+   Layout: an asymmetric 12-column editorial grid on warm paper. The page runs
+   like a day: bright morning sections, a golden afternoon, then night-navy
+   editorial sections. Artwork is treated as die-cut stickers in a scrapbook. */
+
+:root {
+  /* Color: drawn from the artwork (polo blue, podcast orange, badge navy) */
+  --paper: #f6efe1;
+  --paper-2: #ece0c7; /* kraft panels, tags */
+  --paper-3: #fbf7ee; /* card stock */
+  --ink: #0d1b3d; /* badge navy, text */
+  --ink-2: #3c4766; /* secondary text on paper */
+  --night: #0a142e;
+  --blue: #1a6be6; /* polo blue, large text and fills */
+  --blue-ink: #1456c2; /* blue for small text on paper */
+  --orange: #f2780f; /* podcast orange, fills and text on navy */
+  --orange-ink: #b04e09; /* orange for small text on paper */
+  --sun: #f6b63e;
+  --khaki: #d8b47a;
+  --line: rgb(13 27 61 / 0.14);
+  --line-strong: rgb(13 27 61 / 0.28);
+  --on-night: #f6efe1;
+  --on-night-2: #b9c0d4;
+
+  /* Type */
+  --display: 'Bricolage Grotesque', 'Arial Narrow', 'Helvetica Neue', Arial, sans-serif;
+  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --body: 'Figtree', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.25rem;
+  --step-2: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+  --step-3: clamp(1.9rem, 1.4rem + 2vw, 2.9rem);
+  --step-4: clamp(2.5rem, 1.6rem + 4vw, 4.75rem);
+  --step-5: clamp(3.1rem, 1.2rem + 8.6vw, 9rem);
+
+  /* Space and frame */
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1320px;
+  --section: clamp(4.5rem, 3rem + 7vw, 9.5rem);
+  --radius: 6px;
+  --shadow-hard: 3px 3px 0 var(--ink);
+  --header-h: 68px;
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  font-feature-settings: 'kern', 'liga';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  font-variation-settings: 'opsz' 96;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.night :focus-visible,
+.on-night :focus-visible {
+  outline-color: var(--sun);
+}
+
+::selection {
+  background: var(--sun);
+  color: var(--ink);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+.skip-link:focus {
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+}
+
+/* ---------- Frame ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.night {
+  background: var(--night);
+  color: var(--on-night);
+}
+
+/* ---------- Type helpers ---------- */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange-ink);
+}
+.eyebrow::before {
+  content: '';
+  width: 1.75rem;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+.night .eyebrow,
+.on-night .eyebrow {
+  color: var(--orange);
+}
+
+.h-xl {
+  font-size: var(--step-5);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+}
+.h-lg {
+  font-size: var(--step-4);
+}
+.h-md {
+  font-size: var(--step-3);
+  line-height: 1;
+}
+
+/* An italic serif word set into the grotesque display: the "moment" */
+.say {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.55;
+  max-width: 34em;
+  color: var(--ink-2);
+}
+.night .lede,
+.on-night .lede {
+  color: var(--on-night-2);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+  --btn-shadow: var(--orange);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 52px;
+  padding: 0.8rem 1.4rem;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font: 700 1rem/1.1 var(--body);
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--btn-shadow);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--btn-shadow);
+}
+.btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--btn-shadow);
+}
+.btn svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  --btn-shadow: var(--ink);
+}
+.btn--light {
+  --btn-bg: var(--paper);
+  --btn-fg: var(--ink);
+  --btn-shadow: var(--orange);
+  border-color: var(--paper);
+}
+.btn--orange {
+  --btn-bg: var(--orange);
+  --btn-fg: var(--ink);
+  --btn-shadow: var(--paper);
+  border-color: var(--orange);
+}
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--blue-ink);
+  border-bottom: 2px solid currentColor;
+  padding-bottom: 2px;
+  transition: gap 0.2s ease;
+}
+.link-arrow:hover {
+  gap: 0.75rem;
+}
+.night .link-arrow,
+.on-night .link-arrow {
+  color: var(--sun);
+}
+
+/* ---------- Stickers and scrapbook bits ---------- */
+
+.sticker {
+  filter: drop-shadow(0 14px 18px rgb(13 27 61 / 0.18)) drop-shadow(0 2px 2px rgb(13 27 61 / 0.12));
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.night .sticker {
+  filter: drop-shadow(0 16px 22px rgb(0 0 0 / 0.45));
+}
+
+/* A strip of masking tape */
+.tape {
+  position: absolute;
+  width: 120px;
+  height: 30px;
+  background: rgb(242 120 15 / 0.55);
+  mix-blend-mode: multiply;
+  clip-path: polygon(3% 0, 97% 6%, 100% 50%, 96% 100%, 2% 94%, 0 45%);
+  z-index: 2;
+}
+.tape--blue {
+  background: rgb(26 107 230 / 0.35);
+}
+
+/* Hang tag: design number and name, like the tag on a new tee */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.8rem 0.35rem 1.4rem;
+  position: relative;
+  background: var(--paper-2);
+  color: var(--ink);
+  border-radius: 3px 999px 999px 3px;
+  font: 600 0.8rem/1.2 var(--body);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.tag::before {
+  content: '';
+  position: absolute;
+  left: 0.55rem;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+.tag b {
+  white-space: nowrap;
+  font-family: var(--display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.pace {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+}
+.pace--out-there {
+  color: var(--blue-ink);
+}
+.pace--close-to-home {
+  color: var(--orange-ink);
+}
+.pace--signature {
+  color: var(--ink-2);
+}
+
+/* Hand-drawn underline */
+.scribble {
+  position: relative;
+  white-space: nowrap;
+}
+.scribble svg {
+  position: absolute;
+  left: -2%;
+  bottom: -0.18em;
+  width: 104%;
+  height: 0.32em;
+  overflow: visible;
+  pointer-events: none;
+}
+.scribble path {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+/* ---------- Forms ---------- */
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+.field label,
+.label {
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+.input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper-3);
+  color: var(--ink);
+  font: 500 1.0625rem/1.4 var(--body);
+}
+textarea.input {
+  min-height: 130px;
+  resize: vertical;
+}
+.input::placeholder {
+  color: #6c738a;
+}
+.night .input {
+  background: rgb(246 239 225 / 0.06);
+  border-color: rgb(246 239 225 / 0.5);
+  color: var(--on-night);
+}
+.night .input::placeholder {
+  color: #9aa3bb;
+}
+
+.form-note {
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+.form-note[data-state='preview'] {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.night .form-note[data-state='preview'] {
+  background: rgb(246 239 225 / 0.1);
+  color: var(--on-night);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,332 @@
+---
+import { Image } from 'astro:assets';
+import { bySlug } from '../data/moments';
+import Wordmark from './Wordmark.astro';
+
+interface Props {
+  current: 'home' | 'shop' | 'podcast';
+}
+const { current } = Astro.props;
+
+const links = [
+  { href: '/shop', label: 'Shop', key: 'shop' },
+  { href: '/podcast', label: 'Podcast', key: 'podcast' },
+  { href: '/#story', label: 'Our story', key: 'story' },
+  { href: '/#your-turn', label: 'Your nice day', key: 'card' },
+];
+const peace = bySlug('02-peace-sign');
+---
+
+<header class="site-header" data-header data-tone={current === 'podcast' ? 'night' : undefined}>
+  <div class="wrap site-header__row">
+    <a class="site-header__brand" href="/" aria-label="Had A Nice Day, home">
+      <Wordmark />
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-current={current === l.key ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="site-header__actions">
+      <a class="btn site-header__cta" href="#drop-list">Get on the list</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" data-menu-open>
+        <span class="menu-btn__lines" aria-hidden="true"><span></span><span></span></span>
+        <span class="menu-btn__label">Menu</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="menu night" id="menu" role="dialog" aria-modal="true" aria-label="Menu" hidden data-menu>
+  <div class="wrap menu__inner">
+    <div class="menu__top">
+      <a href="/" class="menu__brand" aria-label="Had A Nice Day, home"><Wordmark /></a>
+      <button class="menu-btn menu-btn--close" type="button" data-menu-close>
+        <span class="menu-btn__label">Close</span>
+      </button>
+    </div>
+    <ul class="menu__links">
+      {
+        [{ href: '/', label: 'Home' }, ...links].map((l, i) => (
+          <li style={`--i:${i}`}>
+            <a href={l.href}>{l.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="menu__tag">Wear the moment.</p>
+    {
+      peace && (
+        <Image
+          class="menu__handy sticker"
+          src={peace.image!}
+          alt=""
+          widths={[240, 480]}
+          sizes="240px"
+          format="webp"
+          loading="lazy"
+        />
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 40;
+    background: rgb(246 239 225 / 0.86);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.25s ease;
+  }
+  :global(body)::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 41;
+    background: var(--paper);
+  }
+  .site-header[data-scrolled] {
+    border-bottom-color: var(--line);
+  }
+  .site-header[data-tone='night'] {
+    background: rgb(13 27 61 / 0.9);
+    color: var(--on-night);
+  }
+  .site-header[data-tone='night'][data-scrolled] {
+    border-bottom-color: rgb(246 239 225 / 0.14);
+  }
+  .site-header[data-tone='night'] .site-nav a:hover {
+    background: rgb(246 239 225 / 0.1);
+  }
+  .site-header[data-tone='night'] .site-nav a[aria-current='page'] {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .site-header[data-tone='night'] .site-header__cta {
+    --btn-bg: var(--orange);
+    --btn-fg: var(--ink);
+    --btn-shadow: var(--paper);
+    border-color: var(--orange);
+  }
+  .site-header__row {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: var(--header-h);
+  }
+  .site-header__brand {
+    text-decoration: none;
+    flex: none;
+  }
+  .site-nav {
+    margin-left: auto;
+  }
+  .site-nav ul {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .site-nav a {
+    display: block;
+    padding: 0.5rem 0.85rem;
+    font-weight: 600;
+    font-size: 0.98rem;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: background-color 0.2s ease;
+  }
+  .site-nav a:hover {
+    background: var(--paper-2);
+  }
+  .site-nav a[aria-current='page'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .site-header__cta {
+    min-height: 44px;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  .menu-btn {
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: 700 0.95rem/1 var(--body);
+    cursor: pointer;
+  }
+  .menu-btn__lines {
+    display: grid;
+    gap: 5px;
+    width: 18px;
+  }
+  .menu-btn__lines span {
+    display: block;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+  .menu-btn__lines span:last-child {
+    width: 12px;
+  }
+
+  @media (max-width: 960px) {
+    .site-nav {
+      display: none;
+    }
+    .site-header__actions {
+      margin-left: auto;
+    }
+    .menu-btn {
+      display: inline-flex;
+    }
+  }
+  @media (max-width: 520px) {
+    .site-header__cta {
+      display: none;
+    }
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    overflow-y: auto;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .menu__inner {
+    position: relative;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-block: 0 2rem;
+  }
+  .menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+  }
+  .menu__brand {
+    text-decoration: none;
+  }
+  .menu-btn--close {
+    display: inline-flex;
+  }
+  .menu__links {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: 2.5rem;
+  }
+  .menu__links a {
+    display: inline-block;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 11vw, 4rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    text-decoration: none;
+  }
+  .menu__links a:hover,
+  .menu__links a:focus-visible {
+    color: var(--orange);
+  }
+  .menu__tag {
+    margin-top: auto;
+    padding-top: 2rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.75rem;
+    color: var(--sun);
+  }
+  .menu__handy {
+    position: absolute;
+    right: max(var(--gutter), env(safe-area-inset-right, 0px));
+    bottom: 1.5rem;
+    width: min(34vw, 170px);
+    --tilt: 8deg;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .menu:not([hidden]) .menu__links li {
+      animation: menu-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: calc(var(--i) * 45ms);
+    }
+    .menu:not([hidden]) .menu__handy {
+      animation: handy-in 0.6s 0.15s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+  }
+  @keyframes menu-in {
+    from {
+      transform: translateY(18px);
+      opacity: 0;
+    }
+  }
+  @keyframes handy-in {
+    from {
+      transform: translateY(40px) rotate(-6deg);
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+
+  const onScroll = () => header?.toggleAttribute('data-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const setOpen = (open: boolean) => {
+    if (!menu || !openBtn) return;
+    menu.hidden = !open;
+    openBtn.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    (open ? closeBtn : openBtn)?.focus();
+  };
+  openBtn?.addEventListener('click', () => setOpen(true));
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  menu?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.hidden) setOpen(false);
+    if (e.key === 'Tab' && menu && !menu.hidden) {
+      const items = [...menu.querySelectorAll<HTMLElement>('a, button')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
+</script>

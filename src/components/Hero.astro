@@ -1,0 +1,497 @@
+---
+import { Image } from 'astro:assets';
+import { bySlug, dayMinutes, type Moment } from '../data/moments';
+
+// Order of moments in the hero. Missing artwork is skipped automatically.
+const order = [
+  '03-motorcycle',
+  '04-golf',
+  '11-jogging',
+  '12-baking-cookies',
+  '05-sports-car',
+  '01-tree-cutting',
+  '07-rodeo',
+  '09-bronze-singing-bowls',
+  '02-peace-sign',
+];
+const items = order.map(bySlug).filter((m): m is Moment => Boolean(m));
+
+// Sun height follows the moment's time of day: low at dawn and dusk,
+// high at midday, replaced by a moon after dark.
+const sky = (m: Moment) => {
+  if (!m.time) return { y: 58, color: 'var(--orange)', moon: false };
+  const min = dayMinutes(m.time);
+  if (min >= 20 * 60 || min < 5 * 60) return { y: 30, color: 'var(--paper-3)', moon: true };
+  const t = (min - 6 * 60) / (13 * 60); // 6am..7pm -> 0..1
+  const arc = Math.sin(Math.min(Math.max(t, 0), 1) * Math.PI); // 0..1..0
+  return { y: Math.round(70 - arc * 55), color: arc > 0.75 ? 'var(--sun)' : 'var(--orange)', moon: false };
+};
+const first = items[0];
+---
+
+<section class="hero" data-hero>
+  <div class="wrap hero__grid">
+    <div class="hero__head">
+      <p class="eyebrow">Apparel and a podcast from Ron LaBeau</p>
+      <h1 class="hero__title">
+        <span class="hero__line">I had a</span>
+        <span class="hero__line">nice day</span>
+        <span class="hero__say say" data-hero-phrase>{first.phrase}</span>
+      </h1>
+    </div>
+    <div class="hero__body">
+      <p class="lede hero__lede">
+        Everybody says “have a nice day.” We’d rather celebrate the days you actually had. Clothes for the things you
+        love doing, and a podcast about the people who make time for them.
+      </p>
+      <div class="hero__ctas">
+        <a class="btn" href="/shop">
+          Shop the collection
+          <svg viewBox="0 0 24 24" aria-hidden="true"
+            ><path d="M5 12h14m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg
+          >
+        </a>
+        <a class="btn btn--ghost" href="/podcast">Hear the podcast</a>
+      </div>
+    </div>
+
+    <div
+      class="hero__stage"
+      style={`--sun-y:${sky(first).y}%; --sun-color:${sky(first).color}`}
+      data-hero-stage
+      data-moon={sky(first).moon ? '' : undefined}
+    >
+      <div class="hero__sky" aria-hidden="true">
+        <div class="hero__sun"></div>
+      </div>
+      <svg class="hero__stamp" viewBox="0 0 200 200" aria-hidden="true">
+        <defs><path id="stamp-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"></path></defs>
+        <circle cx="100" cy="100" r="96" fill="none" stroke="currentColor" stroke-width="2"></circle>
+        <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 5"></circle>
+        <text><textPath href="#stamp-circle" startOffset="0">WEAR THE MOMENT · WEAR THE MOMENT ·</textPath></text>
+        <text x="100" y="94" text-anchor="middle" class="hero__stamp-day" data-hero-time>{first.time ?? 'ANY DAY'}</text>
+        <text x="100" y="118" text-anchor="middle" class="hero__stamp-sub">TODAY</text>
+      </svg>
+      <div class="hero__art-box">
+        {
+          items.map((m, i) => (
+            <figure
+              class:list={['hero__art', { 'is-active': i === 0, 'is-cut': !m.complete }]}
+              data-hero-art={m.slug}
+              data-phrase={m.phrase}
+              data-time={m.time ?? 'ANY DAY'}
+              data-no={m.no}
+              data-name={m.name}
+              data-sun-y={sky(m).y}
+              data-sun-color={sky(m).color}
+              data-moon={sky(m).moon ? 'true' : 'false'}
+              aria-hidden={i === 0 ? undefined : 'true'}
+            >
+              <Image
+                src={m.image!}
+                alt={m.alt}
+                widths={[420, 640, 900, 1200]}
+                sizes="(max-width: 860px) 86vw, 42vw"
+                format="webp"
+                quality={82}
+                loading={i === 0 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : 'auto'}
+              />
+            </figure>
+          ))
+        }
+      </div>
+      <div class="hero__horizon" aria-hidden="true"></div>
+      <a class="tag hero__tag" href={`/shop#${first.slug}`} data-hero-tag>
+        <b data-hero-no>No. {first.no}</b>
+        <span data-hero-name>{first.name}</span>
+      </a>
+    </div>
+
+    <div class="hero__picker">
+      <div class="hero__picker-head">
+        <p class="label" id="picker-label">Pick a moment</p>
+        <button class="hero__pause" type="button" data-hero-pause aria-pressed="false">
+          <span data-pause-label>Pause</span>
+        </button>
+      </div>
+      <div class="hero__chips" role="group" aria-labelledby="picker-label">
+        {
+          items.map((m, i) => (
+            <button
+              class="hero__chip"
+              type="button"
+              data-hero-pick={m.slug}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              aria-label={`${m.name}: I had a nice day ${m.phrase}`}
+            >
+              <Image src={m.image!} alt="" widths={[96, 192]} sizes="64px" format="webp" loading="lazy" />
+              <span>{m.name}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-hero-live></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: clamp(2rem, 1rem + 4vw, 5rem) clamp(3.5rem, 2rem + 5vw, 7rem);
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+    grid-template-areas:
+      'head stage'
+      'body stage'
+      'picker stage';
+    grid-template-rows: auto auto 1fr;
+    column-gap: clamp(1.5rem, 4vw, 4.5rem);
+    row-gap: 1.6rem;
+    align-items: start;
+  }
+  .hero__head {
+    grid-area: head;
+    display: grid;
+    gap: 1.6rem;
+    padding-top: clamp(0rem, 2vw, 2rem);
+  }
+  .hero__body {
+    grid-area: body;
+    display: grid;
+    gap: 1.6rem;
+  }
+  .hero__title {
+    font-size: var(--step-5);
+    line-height: 0.84;
+    letter-spacing: -0.05em;
+  }
+  .hero__line {
+    display: block;
+  }
+  .hero__say {
+    display: block;
+    margin-top: 0.22em;
+    font-size: 0.5em;
+    line-height: 1.02;
+    color: var(--blue);
+    min-height: 2.04em;
+    max-width: 12em;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+  .hero__say.is-swapping {
+    opacity: 0;
+    transform: translateY(0.15em);
+  }
+  .hero__lede {
+    max-width: 31em;
+  }
+  .hero__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+
+  /* Stage: art standing on a horizon, sun or moon behind it */
+  .hero__stage {
+    grid-area: stage;
+    position: relative;
+    aspect-ratio: 1 / 1.04;
+    max-width: 100%;
+    align-self: center;
+  }
+  .hero__sky {
+    position: absolute;
+    inset: 0 0 12% 0;
+    overflow: hidden;
+    border-radius: 0 0 2px 2px;
+  }
+  .hero__sun {
+    position: absolute;
+    left: 50%;
+    top: var(--sun-y);
+    width: 74%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--sun-color);
+    transform: translateX(-50%);
+    transition:
+      top 0.9s cubic-bezier(0.45, 0, 0.2, 1),
+      background-color 0.9s ease,
+      box-shadow 0.9s ease;
+  }
+  .hero__stage[data-moon] .hero__sun {
+    box-shadow:
+      inset -2.2rem -1rem 0 0 var(--paper-2),
+      0 0 0 18px rgb(13 27 61 / 0.05);
+  }
+  .hero__horizon {
+    position: absolute;
+    left: -4%;
+    right: -4%;
+    bottom: 12%;
+    height: 3px;
+    background: var(--ink);
+    border-radius: 3px;
+  }
+  .hero__art-box {
+    position: absolute;
+    inset: 4% 6% 12% 6%;
+  }
+  .hero__art {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(26px) rotate(5deg) scale(0.94);
+    transition:
+      opacity 0.3s ease,
+      transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .hero__art.is-leaving {
+    opacity: 0;
+    transform: translateY(-14px) rotate(-5deg) scale(0.97);
+    transition-timing-function: ease, ease-in;
+    transition-duration: 0.25s, 0.3s;
+  }
+  .hero__art.is-active {
+    opacity: 1;
+    transform: none;
+  }
+  .hero__art img {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 18px 20px rgb(13 27 61 / 0.18));
+  }
+  /* Artwork whose supplied file is cut off at the bottom sits flush on the horizon */
+  .hero__art.is-cut {
+    bottom: -1px;
+  }
+  .hero__art.is-cut img {
+    filter: none;
+  }
+  .hero__art:not(.is-cut) {
+    bottom: 2%;
+  }
+
+  .hero__stamp {
+    position: absolute;
+    top: 1%;
+    right: -2%;
+    width: clamp(92px, 11vw, 136px);
+    color: var(--ink);
+    transform: rotate(12deg);
+    z-index: 3;
+  }
+  .hero__stamp text {
+    fill: currentColor;
+    font-family: var(--body);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 3.2px;
+  }
+  .hero__stamp .hero__stamp-day {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 25px;
+    letter-spacing: -0.5px;
+  }
+  .hero__stamp .hero__stamp-sub {
+    font-size: 11px;
+    letter-spacing: 4px;
+    fill: var(--orange-ink);
+  }
+  .hero__tag {
+    position: absolute;
+    left: 0;
+    bottom: 1%;
+    transform: rotate(-3deg);
+    box-shadow: 0 6px 14px rgb(13 27 61 / 0.12);
+    z-index: 3;
+  }
+
+  .hero__picker {
+    grid-area: picker;
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+    padding-top: 0.9rem;
+  }
+  .hero__picker-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 640px;
+  }
+  .hero__pause {
+    border: 0;
+    background: none;
+    color: var(--ink-2);
+    font: 600 0.85rem/1 var(--body);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 0.5rem 0;
+  }
+  .hero__chips {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 4px 4px 10px;
+    margin-block: -4px;
+    margin-inline: -4px 0;
+    scrollbar-width: thin;
+  }
+  .hero__chip {
+    flex: none;
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+    width: 88px;
+    padding: 0.55rem 0.3rem 0.5rem;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background: transparent;
+    color: var(--ink);
+    font: 600 0.75rem/1.15 var(--body);
+    text-align: center;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .hero__chip img {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .hero__chip:hover {
+    background: var(--paper-2);
+  }
+  .hero__chip:hover img {
+    transform: rotate(-6deg) scale(1.08);
+  }
+  .hero__chip[aria-pressed='true'] {
+    border-color: var(--ink);
+    background: var(--paper-3);
+  }
+
+  @media (max-width: 860px) {
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'head'
+        'stage'
+        'picker'
+        'body';
+      grid-template-rows: none;
+      row-gap: 1.5rem;
+    }
+    .hero__title {
+      font-size: clamp(3.6rem, 17vw, 7rem);
+    }
+    .hero__stage {
+      width: min(100%, 440px);
+      justify-self: center;
+    }
+    .hero__say {
+      font-size: 0.5em;
+      min-height: 1.02em;
+    }
+    .hero__picker {
+      padding-top: 0;
+    }
+    .hero__body {
+      padding-top: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  if (hero) {
+    const stage = hero.querySelector<HTMLElement>('[data-hero-stage]')!;
+    const arts = [...hero.querySelectorAll<HTMLElement>('[data-hero-art]')];
+    const chips = [...hero.querySelectorAll<HTMLButtonElement>('[data-hero-pick]')];
+    const phrase = hero.querySelector<HTMLElement>('[data-hero-phrase]')!;
+    const time = hero.querySelector<SVGTextElement>('[data-hero-time]')!;
+    const tag = hero.querySelector<HTMLAnchorElement>('[data-hero-tag]')!;
+    const no = hero.querySelector<HTMLElement>('[data-hero-no]')!;
+    const name = hero.querySelector<HTMLElement>('[data-hero-name]')!;
+    const live = hero.querySelector<HTMLElement>('[data-hero-live]')!;
+    const pause = hero.querySelector<HTMLButtonElement>('[data-hero-pause]')!;
+    const pauseLabel = pause.querySelector<HTMLElement>('[data-pause-label]')!;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let index = 0;
+    let timer: number | undefined;
+    let paused = reduced;
+
+    const show = (next: number, announce = false) => {
+      if (next === index) return;
+      const prev = arts[index];
+      const art = arts[next];
+      prev.classList.remove('is-active');
+      prev.classList.add('is-leaving');
+      prev.setAttribute('aria-hidden', 'true');
+      window.setTimeout(() => prev.classList.remove('is-leaving'), 320);
+      art.classList.add('is-active');
+      art.removeAttribute('aria-hidden');
+
+      const d = art.dataset;
+      stage.style.setProperty('--sun-y', `${d.sunY}%`);
+      stage.style.setProperty('--sun-color', d.sunColor!);
+      stage.toggleAttribute('data-moon', d.moon === 'true');
+      time.textContent = d.time!;
+      no.textContent = `No. ${d.no}`;
+      name.textContent = d.name!;
+      tag.href = `/shop#${d.heroArt}`;
+
+      phrase.classList.add('is-swapping');
+      window.setTimeout(() => {
+        phrase.textContent = d.phrase!;
+        phrase.classList.remove('is-swapping');
+      }, reduced ? 0 : 220);
+
+      chips.forEach((c, i) => c.setAttribute('aria-pressed', String(i === next)));
+      if (announce) live.textContent = `I had a nice day ${d.phrase}`;
+      index = next;
+    };
+
+    const setPaused = (value: boolean) => {
+      paused = value;
+      pause.setAttribute('aria-pressed', String(value));
+      pauseLabel.textContent = value ? 'Play' : 'Pause';
+      window.clearInterval(timer);
+      if (!value) timer = window.setInterval(() => show((index + 1) % arts.length), 4200);
+    };
+
+    chips.forEach((chip, i) =>
+      chip.addEventListener('click', () => {
+        setPaused(true);
+        show(i, true);
+      }),
+    );
+    pause.addEventListener('click', () => setPaused(!paused));
+
+    // Only cycle while the hero is on screen.
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !paused) setPaused(false);
+      else window.clearInterval(timer);
+    }).observe(hero);
+    setPaused(paused);
+  }
+</script>

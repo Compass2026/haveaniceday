@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { bySlug } from '../data/moments';
+const car = bySlug('05-sports-car') ?? bySlug('02-peace-sign');
+---
+
+<Base title="Page not found">
+  <section class="lost section">
+    <div class="wrap lost__grid">
+      <div class="lost__copy">
+        <p class="eyebrow">Error 404</p>
+        <h1 class="h-xl">Took a <span class="say">wrong turn.</span></h1>
+        <p class="lede">This page doesn’t exist. Maybe it took the long way home. Let’s get you somewhere good.</p>
+        <div class="lost__ctas">
+          <a class="btn" href="/">Back to the start</a>
+          <a class="btn btn--ghost" href="/shop">Shop the collection</a>
+        </div>
+      </div>
+      {car && <Image class="sticker lost__img" src={car.image!} alt="" widths={[480, 900]} sizes="40vw" format="webp" />}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
+  }
+  .lost__copy {
+    display: grid;
+    gap: 1.4rem;
+  }
+  .lost__copy .say {
+    color: var(--blue);
+  }
+  .lost__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+  }
+  .lost__img {
+    --tilt: -6deg;
+  }
+  @media (max-width: 760px) {
+    .lost__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

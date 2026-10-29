@@ -1,0 +1,100 @@
+{
+  "02-peace-sign": {
+    "source": "02_Peace_sign_print.png",
+    "sourceSize": [
+      3600,
+      4500
+    ],
+    "dpi": 300,
+    "webMaster": [
+      1101,
+      1716
+    ],
+    "complete": true,
+    "note": null
+  },
+  "04-golf": {
+    "source": "04_Golf_print.png",
+    "sourceSize": [
+      3600,
+      4500
+    ],
+    "dpi": 300,
+    "webMaster": [
+      1637,
+      1700
+    ],
+    "complete": true,
+    "note": null
+  },
+  "05-sports-car": {
+    "source": "05_Sports_car_print.png",
+    "sourceSize": [
+      3600,
+      4500
+    ],
+    "dpi": 300,
+    "webMaster": [
+      1698,
+      897
+    ],
+    "complete": true,
+    "note": null
+  },
+  "09-bronze-singing-bowls": {
+    "source": "09_Bronze_singing_bowls_print.png",
+    "sourceSize": [
+      3600,
+      4500
+    ],
+    "dpi": 300,
+    "webMaster": [
+      1700,
+      1323
+    ],
+    "complete": false,
+    "note": "PNG data ends early (IDAT (cut short)). Only 3271 of 4500 rows decode, so the bottom of the artwork is missing in the supplied file."
+  },
+  "11-jogging": {
+    "source": "11_Jogging_print.png",
+    "sourceSize": [
+      3600,
+      4500
+    ],
+    "dpi": 300,
+    "webMaster": [
+      1082,
+      1720
+    ],
+    "complete": true,
+    "note": null
+  },
+  "podcast-logo": {
+    "source": "HAND Logo.png",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "dpi": 72,
+    "webMaster": [
+      1222,
+      1292
+    ],
+    "complete": true,
+    "note": null
+  },
+  "03-motorcycle": {
+    "source": "REVISED-03_Motorcycle_print.png",
+    "sourceSize": [
+      1122,
+      1402
+    ],
+    "dpi": 72,
+    "webMaster": [
+      1126,
+      1080
+    ],
+    "complete": true,
+    "note": null
+  }
+}

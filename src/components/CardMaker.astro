@@ -1,0 +1,500 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { collection } from '../data/moments';
+import { site } from '../data/site';
+import FormNote from './FormNote.astro';
+
+const choices = await Promise.all(
+  collection
+    .filter((m) => m.slug !== '10-podcast')
+    .map(async (m) => ({
+      ...m,
+      // A mid-size copy for the canvas export (same origin, keeps transparency)
+      full: (await getImage({ src: m.image!, width: 900, format: 'webp' })).src,
+    })),
+);
+const start = choices.find((c) => c.slug === '02-peace-sign') ?? choices[0];
+---
+
+<section class="maker section" id="your-turn" aria-labelledby="maker-title">
+  <div class="wrap maker__grid">
+    <div class="maker__head">
+      <p class="eyebrow">Your turn</p>
+      <h2 class="h-lg" id="maker-title">Had a nice day? <span class="say">Put it on a card.</span></h2>
+      <p class="lede">
+        Finish the sentence, pick a sticker, and save it for the fridge or the group chat. If it’s a good story, send it
+        to the show. Ron reads every one.
+      </p>
+    </div>
+    <div class="maker__copy">
+
+      <form class="maker__form" data-form data-endpoint={site.forms.story} data-maker-form novalidate>
+        <div class="field">
+          <label for="maker-text">Finish the sentence: I had a nice day…</label>
+          <input
+            class="input"
+            id="maker-text"
+            name="moment"
+            maxlength="70"
+            placeholder="baking cookies with my grandkids"
+            autocomplete="off"
+            required
+            data-maker-text
+          />
+        </div>
+        <div class="maker__row">
+          <div class="field">
+            <label for="maker-name">First name <span class="maker__opt">(optional)</span></label>
+            <input class="input" id="maker-name" name="name" maxlength="24" autocomplete="given-name" data-maker-name />
+          </div>
+          <div class="field">
+            <label for="maker-email">Email <span class="maker__opt">(if you’re sending it)</span></label>
+            <input class="input" id="maker-email" name="email" type="email" autocomplete="email" />
+          </div>
+        </div>
+        <fieldset class="maker__stickers">
+          <legend class="label">Pick a sticker</legend>
+          <div class="maker__choices">
+            {
+              choices.map((c) => (
+                <label class="maker__choice">
+                  <input
+                    type="radio"
+                    name="sticker"
+                    value={c.slug}
+                    id={`sticker-${c.slug}`}
+                    checked={c.slug === start.slug}
+                    data-full={c.full}
+                  />
+                  <Image src={c.image!} alt="" widths={[96, 192]} sizes="56px" format="webp" loading="lazy" />
+                  <span class="visually-hidden">{c.name}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+        <div class="maker__actions">
+          <button class="btn" type="button" data-maker-save>Save the card</button>
+          <button class="btn btn--ghost" type="button" data-maker-share hidden>Share</button>
+          <button class="btn btn--ghost" type="submit">Send it to the show</button>
+        </div>
+        <FormNote ok="Got it. Thanks for sharing your day with us." />
+      </form>
+    </div>
+
+    <div class="maker__preview">
+      <figure class="card" data-card aria-label="Card preview">
+        <div class="card__inner">
+          <p class="card__brand">Had A Nice Day<span>.</span></p>
+          <p class="card__main">I had a nice day</p>
+          <p class="card__moment say" data-card-moment>baking cookies with my grandkids.</p>
+          <p class="card__from"><span data-card-name></span><span data-card-date></span></p>
+          <img class="card__sticker" src={start.full} alt="" data-card-sticker width="300" height="300" />
+          <svg class="card__stamp" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2.5"></circle>
+            <circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+            <text x="60" y="56" text-anchor="middle">WEAR THE</text>
+            <text x="60" y="74" text-anchor="middle">MOMENT</text>
+          </svg>
+        </div>
+      </figure>
+      <p class="maker__hint">Example card. It updates as you type.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .maker {
+    background: var(--orange);
+    color: var(--ink);
+  }
+  .maker .eyebrow {
+    color: var(--ink);
+  }
+  .maker .lede {
+    color: var(--ink);
+  }
+  .maker .say {
+    color: var(--paper-3);
+  }
+  .maker__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-areas:
+      'head preview'
+      'form preview';
+    gap: 1.5rem clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .maker__head {
+    grid-area: head;
+    display: grid;
+    gap: 1.5rem;
+    align-self: end;
+  }
+  .maker__copy {
+    grid-area: form;
+    display: grid;
+    gap: 1.5rem;
+    align-self: start;
+  }
+  .maker__form {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 0.5rem;
+  }
+  .maker__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .maker__opt {
+    font-weight: 500;
+  }
+  .maker__stickers {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .maker__choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .maker__choice {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: rgb(251 247 238 / 0.45);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .maker__choice input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .maker__choice img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+  .maker__choice:has(input:checked) {
+    background: var(--paper-3);
+    border-color: var(--ink);
+  }
+  .maker__choice:has(input:focus-visible) {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .maker__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+  .maker .btn {
+    --btn-shadow: var(--paper-3);
+  }
+  .maker .btn--ghost {
+    --btn-shadow: var(--ink);
+  }
+  .maker .form-note[data-state='error'] {
+    font-weight: 700;
+  }
+
+  /* The postcard: airmail border, card stock, a stamp */
+  .maker__preview {
+    grid-area: preview;
+    display: grid;
+    gap: 0.75rem;
+    justify-items: center;
+  }
+  .card {
+    margin: 0;
+    width: 100%;
+    max-width: 620px;
+    aspect-ratio: 8 / 5;
+    padding: 12px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--blue) 0 16px,
+      var(--paper-3) 16px 24px,
+      var(--ink) 24px 40px,
+      var(--paper-3) 40px 48px
+    );
+    box-shadow: 0 30px 60px -28px rgb(13 27 61 / 0.6);
+    transform: rotate(1.5deg);
+    container-type: inline-size;
+  }
+  .card__inner {
+    position: relative;
+    height: 100%;
+    background: var(--paper-3);
+    padding: 6cqi 5cqi;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card__brand {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 2.6cqi;
+    letter-spacing: -0.02em;
+  }
+  .card__brand span {
+    color: var(--orange);
+  }
+  .card__main {
+    margin-top: auto;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 6.2cqi;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    max-width: 62%;
+  }
+  .card__moment {
+    margin-top: 1.4cqi;
+    font-size: 5.2cqi;
+    line-height: 1.02;
+    color: var(--blue) !important;
+    max-width: 60%;
+    min-height: 2.04em;
+    overflow-wrap: anywhere;
+  }
+  .card__from {
+    display: flex;
+    gap: 1.6cqi;
+    margin-top: 3cqi;
+    font-size: 2.2cqi;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .card__from span:empty {
+    display: none;
+  }
+  .card__sticker {
+    position: absolute;
+    right: 4cqi;
+    bottom: 5cqi;
+    width: 34%;
+    height: 62%;
+    object-fit: contain;
+    transform: rotate(4deg);
+    filter: drop-shadow(0 1.6cqi 1.6cqi rgb(13 27 61 / 0.2));
+  }
+  .card__stamp {
+    position: absolute;
+    top: 4cqi;
+    right: 4cqi;
+    width: 14cqi;
+    color: var(--orange-ink);
+    transform: rotate(-12deg);
+    opacity: 0.85;
+  }
+  .card__stamp text {
+    fill: currentColor;
+    font: 700 13px var(--body);
+    letter-spacing: 1.5px;
+  }
+  .maker__hint {
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  @media (max-width: 960px) {
+    .maker__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'head'
+        'preview'
+        'form';
+      row-gap: 2rem;
+    }
+  }
+  @media (max-width: 520px) {
+    .maker__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-maker-form]');
+  if (form) {
+    const text = form.querySelector<HTMLInputElement>('[data-maker-text]')!;
+    const name = form.querySelector<HTMLInputElement>('[data-maker-name]')!;
+    const save = form.querySelector<HTMLButtonElement>('[data-maker-save]')!;
+    const share = form.querySelector<HTMLButtonElement>('[data-maker-share]')!;
+    const moment = document.querySelector<HTMLElement>('[data-card-moment]')!;
+    const nameOut = document.querySelector<HTMLElement>('[data-card-name]')!;
+    const dateOut = document.querySelector<HTMLElement>('[data-card-date]')!;
+    const sticker = document.querySelector<HTMLImageElement>('[data-card-sticker]')!;
+    const example = text.placeholder;
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    dateOut.textContent = date;
+
+    const sentence = () => {
+      const t = (text.value.trim() || example).replace(/[.!\s]+$/, '');
+      return `${t}.`;
+    };
+    const update = () => {
+      moment.textContent = sentence();
+      nameOut.textContent = name.value.trim() ? `From ${name.value.trim()}` : '';
+      const picked = form.querySelector<HTMLInputElement>('input[name="sticker"]:checked');
+      if (picked?.dataset.full) sticker.src = picked.dataset.full;
+    };
+    form.addEventListener('input', update);
+    form.addEventListener('change', update);
+    update();
+
+    // Draw the card at print-friendly size for saving or sharing.
+    const draw = async () => {
+      const W = 1600;
+      const H = 1000;
+      const c = document.createElement('canvas');
+      c.width = W;
+      c.height = H;
+      const g = c.getContext('2d')!;
+      const css = getComputedStyle(document.documentElement);
+      const col = (v: string) => css.getPropertyValue(v).trim();
+      await Promise.all([
+        document.fonts.load('800 120px "Bricolage Grotesque"'),
+        document.fonts.load('italic 80px "Instrument Serif"'),
+        document.fonts.load('600 32px "Figtree"'),
+      ]);
+
+      // Airmail border
+      g.save();
+      g.beginPath();
+      g.rect(0, 0, W, H);
+      g.clip();
+      const stripes = [col('--blue'), col('--paper-3'), col('--ink'), col('--paper-3')];
+      const widths = [32, 16, 32, 16];
+      let x = -H;
+      let s = 0;
+      while (x < W + H) {
+        g.fillStyle = stripes[s % 4];
+        g.beginPath();
+        g.moveTo(x, 0);
+        g.lineTo(x + widths[s % 4], 0);
+        g.lineTo(x + widths[s % 4] - H, H);
+        g.lineTo(x - H, H);
+        g.fill();
+        x += widths[s % 4];
+        s++;
+      }
+      g.restore();
+      g.fillStyle = col('--paper-3');
+      g.fillRect(28, 28, W - 56, H - 56);
+
+      // Sticker
+      const img = new Image();
+      img.src = sticker.src;
+      await img.decode().catch(() => undefined);
+      if (img.naturalWidth) {
+        const boxW = 470;
+        const boxH = 600;
+        const k = Math.min(boxW / img.naturalWidth, boxH / img.naturalHeight);
+        const w = img.naturalWidth * k;
+        const h = img.naturalHeight * k;
+        g.save();
+        g.translate(W - 90 - boxW / 2, H - 90 - h / 2);
+        g.rotate((4 * Math.PI) / 180);
+        g.shadowColor = 'rgba(13,27,61,0.2)';
+        g.shadowBlur = 30;
+        g.shadowOffsetY = 18;
+        g.drawImage(img, -w / 2, -h / 2, w, h);
+        g.restore();
+      }
+
+      // Words
+      g.fillStyle = col('--ink');
+      g.font = '800 40px "Bricolage Grotesque", sans-serif';
+      g.fillText('Had A Nice Day', 100, 140);
+      const bw = g.measureText('Had A Nice Day').width;
+      g.fillStyle = col('--orange');
+      g.fillText('.', 100 + bw, 140);
+
+      g.fillStyle = col('--ink');
+      g.font = '800 100px "Bricolage Grotesque", sans-serif';
+      g.fillText('I had a nice day', 100, 560);
+
+      g.fillStyle = col('--blue');
+      g.font = 'italic 84px "Instrument Serif", serif';
+      const words = sentence().split(/\s+/);
+      const lines: string[] = [];
+      let line = '';
+      for (const w of words) {
+        const test = line ? `${line} ${w}` : w;
+        if (g.measureText(test).width > 860 && line) {
+          lines.push(line);
+          line = w;
+        } else line = test;
+      }
+      lines.push(line);
+      lines.slice(0, 3).forEach((l, i) => g.fillText(l, 100, 660 + i * 86));
+
+      g.fillStyle = col('--ink-2');
+      g.font = '600 32px "Figtree", sans-serif';
+      const from = [name.value.trim() && `From ${name.value.trim()}`, date].filter(Boolean).join('    ');
+      g.fillText(from, 100, H - 100);
+
+      // Stamp
+      g.save();
+      g.translate(W - 190, 190);
+      g.rotate((-12 * Math.PI) / 180);
+      g.strokeStyle = col('--orange-ink');
+      g.fillStyle = col('--orange-ink');
+      g.lineWidth = 5;
+      g.beginPath();
+      g.arc(0, 0, 100, 0, Math.PI * 2);
+      g.stroke();
+      g.lineWidth = 2;
+      g.beginPath();
+      g.arc(0, 0, 80, 0, Math.PI * 2);
+      g.stroke();
+      g.textAlign = 'center';
+      g.font = '700 24px "Figtree", sans-serif';
+      g.fillText('WEAR THE', 0, -4);
+      g.fillText('MOMENT', 0, 28);
+      g.restore();
+
+      return new Promise<Blob | null>((r) => c.toBlob(r, 'image/png'));
+    };
+
+    save.addEventListener('click', async () => {
+      const blob = await draw();
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'had-a-nice-day.png';
+      document.body.append(a);
+      a.click();
+      a.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+    });
+
+    const probe = new File([''], 'card.png', { type: 'image/png' });
+    if (navigator.canShare?.({ files: [probe] })) {
+      share.hidden = false;
+      share.addEventListener('click', async () => {
+        const blob = await draw();
+        if (!blob) return;
+        const file = new File([blob], 'had-a-nice-day.png', { type: 'image/png' });
+        await navigator.share({ files: [file], title: 'I had a nice day' }).catch(() => undefined);
+      });
+    }
+  }
+</script>

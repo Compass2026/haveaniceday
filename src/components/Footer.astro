@@ -1,0 +1,136 @@
+---
+import { site } from '../data/site';
+import Wordmark from './Wordmark.astro';
+import FormNote from './FormNote.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer night">
+  <div class="wrap footer__top" id="drop-list">
+    <div class="footer__pitch">
+      <p class="eyebrow">The drop list</p>
+      <h2 class="h-md">New designs and new episodes, <span class="say">first.</span></h2>
+      <p class="footer__sub">One email when there is something worth opening. That’s it.</p>
+    </div>
+    <form class="footer__form" data-form data-endpoint={site.forms.dropList} novalidate>
+      <div class="field">
+        <label for="drop-email">Email address</label>
+        <div class="footer__row">
+          <input
+            class="input"
+            id="drop-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          />
+          <button class="btn btn--orange" type="submit">Sign me up</button>
+        </div>
+      </div>
+      <FormNote ok="You’re on the list. Talk soon." />
+    </form>
+  </div>
+
+  <div class="wrap footer__mark" aria-hidden="true">
+    <Wordmark size="xl" />
+  </div>
+
+  <div class="wrap">
+    <div class="footer__bottom">
+      <p class="footer__tag">Wear the moment.</p>
+      <nav aria-label="Footer">
+        <ul class="footer__links">
+          <li><a href="/shop">Shop</a></li>
+          <li><a href="/podcast">Podcast</a></li>
+          <li><a href="/#story">Our story</a></li>
+          <li><a href="/#your-turn">Your nice day</a></li>
+        </ul>
+      </nav>
+      <p class="footer__fine">© {year} Had A Nice Day. Founded by Ron LaBeau.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-top: var(--section);
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+  }
+  .footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 6rem);
+    align-items: end;
+  }
+  .footer__pitch {
+    display: grid;
+    gap: 1rem;
+  }
+  .footer__sub {
+    color: var(--on-night-2);
+  }
+  .footer__form {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .footer__row {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .footer__row .input {
+    flex: 1;
+    min-width: 0;
+  }
+  .footer__mark {
+    margin-top: clamp(4rem, 9vw, 8rem);
+    color: var(--paper);
+  }
+  .footer__mark :global(.wordmark) {
+    display: block;
+    transform: translateX(-0.04em);
+  }
+  .footer__bottom {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem 2.5rem;
+    align-items: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(246 239 225 / 0.16);
+  }
+  .footer__tag {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--sun);
+  }
+  .footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+  .footer__links a {
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .footer__links a:hover {
+    color: var(--orange);
+  }
+  .footer__fine {
+    font-size: var(--step--1);
+    color: var(--on-night-2);
+  }
+  @media (max-width: 860px) {
+    .footer__top,
+    .footer__bottom {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 520px) {
+    .footer__row {
+      flex-direction: column;
+    }
+  }
+</style>

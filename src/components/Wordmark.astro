@@ -1,0 +1,36 @@
+---
+// Typographic brand name for navigation. The orange full stop finishes the
+// sentence "I had a nice day." The podcast badge stays podcast-only.
+interface Props {
+  size?: 'sm' | 'xl';
+}
+const { size = 'sm' } = Astro.props;
+---
+
+<span class:list={['wordmark', `wordmark--${size}`]}>
+  Had A Nice Day<span class="wordmark__dot" aria-hidden="true">.</span>
+</span>
+
+<style>
+  .wordmark {
+    display: inline-block;
+    font-family: var(--display);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variation-settings: 'opsz' 48;
+    white-space: nowrap;
+  }
+  .wordmark--sm {
+    font-size: 1.45rem;
+  }
+  .wordmark--xl {
+    font-size: clamp(3rem, 14.2vw, 13.6rem);
+    letter-spacing: -0.055em;
+    line-height: 0.8;
+    font-variation-settings: 'opsz' 96;
+  }
+  .wordmark__dot {
+    color: var(--orange);
+  }
+</style>

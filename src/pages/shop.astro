@@ -1,0 +1,645 @@
+---
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Garment from '../components/Garment.astro';
+import FormNote from '../components/FormNote.astro';
+import { collection, paceLabel, type Pace } from '../data/moments';
+import { site } from '../data/site';
+
+const colors = [
+  { key: 'ivory', label: 'Ivory', hex: '#f1ebdd' },
+  { key: 'heather', label: 'Heather', hex: '#b3b7c0' },
+  { key: 'sky', label: 'Sky', hex: '#a7c8ec' },
+  { key: 'navy', label: 'Navy', hex: '#1c2a4f' },
+];
+const rhythm = ['ivory', 'navy', 'sky', 'heather', 'ivory', 'sky', 'navy', 'heather'];
+
+const items = await Promise.all(
+  collection.map(async (m, i) => ({
+    ...m,
+    print: (await getImage({ src: m.image!, width: 640, format: 'webp' })).src,
+    color: colors.find((c) => c.key === rhythm[i % rhythm.length])!,
+  })),
+);
+
+const counts = (p: Pace) => items.filter((m) => m.pace === p).length;
+const filters: { key: 'all' | Pace; label: string; n: number }[] = [
+  { key: 'all', label: 'All', n: items.length },
+  { key: 'out-there', label: 'Out there', n: counts('out-there') },
+  { key: 'close-to-home', label: 'Close to home', n: counts('close-to-home') },
+  { key: 'signature', label: 'Signature', n: counts('signature') },
+].filter((f) => f.n > 0);
+---
+
+<Base
+  current="shop"
+  title="The Collection"
+  description="Designs for the days worth remembering: rides, rounds, runs, quiet evenings and more. Preview every Had A Nice Day design on a tee or crewneck."
+>
+  <section class="shop-hero">
+    <div class="wrap shop-hero__grid">
+      <div class="shop-hero__copy">
+        <p class="eyebrow">The collection</p>
+        <h1 class="h-xl">Find your <span class="say">moment.</span></h1>
+        <p class="lede">
+          Each design started as a picture of a day somebody had. Pick the one that sounds like you, try it on a tee or
+          a crewneck, and get on the list for the first drop.
+        </p>
+      </div>
+      <aside class="shop-hero__status" aria-label="First drop status">
+        <p class="shop-hero__status-k">First drop</p>
+        <p class="shop-hero__status-v">In the works</p>
+        <p class="shop-hero__status-n">Sizes, fabrics and prices arrive with it. The previews here show placement and color.</p>
+        <a class="link-arrow" href="#drop-list">Tell me when it drops</a>
+      </aside>
+    </div>
+  </section>
+
+  <section class="rack" aria-label="Designs">
+    <div class="wrap">
+      <div class="rack__filters" role="group" aria-label="Filter designs">
+        {
+          filters.map((f, i) => (
+            <button class="rack__filter" type="button" data-filter={f.key} aria-pressed={i === 0 ? 'true' : 'false'}>
+              {f.label} <span>{f.n}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <ul class="rack__grid" data-rack>
+        {
+          items.map((m, i) => (
+            <li class="rack__item" data-pace={m.pace} id={m.slug} style={`--i:${i}`}>
+              <button
+                class="rack__open"
+                type="button"
+                data-open={m.slug}
+                data-print={m.print}
+                data-name={m.name}
+                data-no={m.no}
+                data-line={m.line}
+                data-pace-label={paceLabel[m.pace]}
+                data-pace={m.pace}
+                data-alt={m.alt}
+                data-color={m.color.key}
+                aria-label={`Preview No. ${m.no}, ${m.name}`}
+              >
+                <span class="rack__hanger" aria-hidden="true" />
+                <Garment art={m.print} color={m.color.hex} class="rack__garment" />
+              </button>
+              <div class="rack__meta">
+                <span class="tag">
+                  <b>No. {m.no}</b> {m.name}
+                </span>
+                <span class={`pace pace--${m.pace}`}>{paceLabel[m.pace]}</span>
+              </div>
+              <p class="rack__line">{m.line}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <dialog class="try" data-try aria-labelledby="try-title">
+    <div class="try__inner">
+      <button class="try__close" type="button" data-try-close aria-label="Close preview">
+        <svg viewBox="0 0 24 24" aria-hidden="true"
+          ><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"></path></svg
+        >
+      </button>
+      <div class="try__stage">
+        <Garment art={items[0]?.print ?? ''} color={colors[0].hex} class="try__garment" label="Garment preview" />
+        <div class="try__nav">
+          <button class="try__step" type="button" data-try-step="-1" aria-label="Previous design">←</button>
+          <button class="try__step" type="button" data-try-step="1" aria-label="Next design">→</button>
+        </div>
+      </div>
+      <div class="try__panel">
+        <p class="tag try__tag"><b data-try-no>No. 00</b> <span data-try-pace></span></p>
+        <h2 class="h-md" id="try-title" data-try-name>Design</h2>
+        <p class="try__line" data-try-line></p>
+
+        <fieldset class="try__group">
+          <legend class="label">Cut</legend>
+          <div class="try__options">
+            <label class="try__opt"><input type="radio" name="cut" value="tee" checked /> <span>Tee</span></label>
+            <label class="try__opt"><input type="radio" name="cut" value="crew" /> <span>Crewneck</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="try__group">
+          <legend class="label">Color: <span data-try-color-name>Ivory</span></legend>
+          <div class="try__swatches">
+            {
+              colors.map((c, i) => (
+                <label class="try__swatch" style={`--c:${c.hex}`}>
+                  <input type="radio" name="color" value={c.key} data-hex={c.hex} data-label={c.label} checked={i === 0} />
+                  <span class="visually-hidden">{c.label}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <form class="try__form" data-form data-endpoint={site.forms.dropList} novalidate>
+          <input type="hidden" name="design" value="" data-try-design />
+          <div class="field">
+            <label for="try-email">Get an email when this one drops</label>
+            <div class="try__row">
+              <input class="input" id="try-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+              <button class="btn" type="submit">Notify me</button>
+            </div>
+          </div>
+          <FormNote ok="Done. We’ll email you when it drops." />
+        </form>
+        <p class="try__fine">Preview only. Final garments may differ in color and print size.</p>
+      </div>
+    </div>
+  </dialog>
+</Base>
+
+<style>
+  .shop-hero {
+    padding-block: clamp(2.5rem, 2rem + 4vw, 6rem) clamp(2rem, 4vw, 4rem);
+  }
+  .shop-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 2.5rem clamp(2rem, 5vw, 6rem);
+    align-items: end;
+  }
+  .shop-hero__copy {
+    display: grid;
+    gap: 1.4rem;
+  }
+  .shop-hero__copy .say {
+    color: var(--blue);
+  }
+  .shop-hero__status {
+    position: relative;
+    display: grid;
+    gap: 0.4rem;
+    justify-items: start;
+    padding: 1.6rem 1.6rem 1.6rem 2.6rem;
+    background: var(--paper-2);
+    border-radius: 6px 28px 28px 6px;
+    transform: rotate(1.5deg);
+  }
+  .shop-hero__status::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 1.75rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--paper);
+    box-shadow: inset 0 0 0 2px var(--line-strong);
+  }
+  .shop-hero__status-k {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange-ink);
+  }
+  .shop-hero__status-v {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: var(--step-3);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .shop-hero__status-n {
+    color: var(--ink-2);
+    margin-bottom: 0.6rem;
+  }
+
+  .rack {
+    padding-bottom: var(--section);
+  }
+  .rack__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-bottom: 1.75rem;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .rack__filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink);
+    font: 700 0.95rem/1 var(--body);
+    cursor: pointer;
+  }
+  .rack__filter span {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.6;
+  }
+  .rack__filter[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* A clothing rack: garments hang from a rail, staggered heights */
+  .rack__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(3rem, 6vw, 5.5rem) clamp(1.5rem, 4vw, 4rem);
+  }
+  .rack__item {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+  .rack__item:nth-child(3n + 2) {
+    margin-top: clamp(0rem, 5vw, 4.5rem);
+  }
+  .rack__item[hidden] {
+    display: none;
+  }
+  .rack__open {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 2.2rem 8% 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .rack__hanger {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 64px;
+    height: 34px;
+    transform: translateX(-50%);
+    border: 3px solid var(--ink);
+    border-bottom: 0;
+    border-radius: 40px 40px 0 0 / 30px 30px 0 0;
+  }
+  .rack__hanger::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -16px;
+    width: 12px;
+    height: 16px;
+    margin-left: -3px;
+    border: 3px solid var(--ink);
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 0 10px 0 0;
+  }
+  .rack__open :global(.rack__garment) {
+    transform-origin: 50% 0;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 18px 22px rgb(13 27 61 / 0.14));
+  }
+  .rack__open:hover :global(.rack__garment),
+  .rack__open:focus-visible :global(.rack__garment) {
+    transform: rotate(-2.5deg) translateY(4px);
+  }
+  .rack__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+  .rack__line {
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+
+  /* Try-on dialog */
+  .try {
+    width: min(1040px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 40px 80px -30px rgb(10 20 46 / 0.6);
+    overflow: auto;
+  }
+  .try::backdrop {
+    background: rgb(10 20 46 / 0.6);
+    backdrop-filter: blur(4px);
+  }
+  .try[open] {
+    animation: try-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes try-in {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+  }
+  .try__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+  .try__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .try__close svg {
+    width: 18px;
+  }
+  .try__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background-color: var(--paper-2);
+    background-image: radial-gradient(rgb(13 27 61 / 0.1) 1px, transparent 1.3px);
+    background-size: 18px 18px;
+  }
+  .try__stage :global(.try__garment) {
+    width: min(100%, 440px);
+    filter: drop-shadow(0 24px 26px rgb(13 27 61 / 0.18));
+  }
+  .try__nav {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .try__step {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    font: 700 1.1rem/1 var(--body);
+    cursor: pointer;
+  }
+  .try__panel {
+    display: grid;
+    gap: 1.1rem;
+    align-content: start;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    padding-top: clamp(3.5rem, 5vw, 3.5rem);
+  }
+  .try__tag {
+    justify-self: start;
+  }
+  .try__line {
+    font-size: var(--step-1);
+    color: var(--ink-2);
+  }
+  .try__group {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .try__options {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .try__opt {
+    position: relative;
+    cursor: pointer;
+  }
+  .try__opt input,
+  .try__swatch input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .try__opt span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 1.1rem;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    font-weight: 700;
+  }
+  .try__opt input:checked + span {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .try__opt input:focus-visible + span {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+  .try__swatches {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .try__swatch {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow:
+      inset 0 0 0 1px rgb(13 27 61 / 0.25),
+      0 0 0 3px var(--paper),
+      0 0 0 4px transparent;
+    cursor: pointer;
+  }
+  .try__swatch:has(input:checked) {
+    box-shadow:
+      inset 0 0 0 1px rgb(13 27 61 / 0.25),
+      0 0 0 3px var(--paper),
+      0 0 0 5px var(--ink);
+  }
+  .try__swatch:has(input:focus-visible) {
+    outline: 3px solid var(--blue);
+    outline-offset: 6px;
+  }
+  .try__form {
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+  .try__row {
+    display: flex;
+    gap: 0.6rem;
+  }
+  .try__row .input {
+    flex: 1;
+    min-width: 0;
+  }
+  .try__fine {
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 960px) {
+    .rack__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .rack__item:nth-child(3n + 2) {
+      margin-top: 0;
+    }
+    .rack__item:nth-child(2n) {
+      margin-top: 3rem;
+    }
+    .shop-hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .shop-hero__status {
+      transform: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .try__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .try__stage :global(.try__garment) {
+      width: min(70vw, 300px);
+    }
+    .try {
+      width: calc(100vw - 16px);
+      max-height: calc(100dvh - 16px);
+    }
+  }
+  @media (max-width: 520px) {
+    .rack__grid {
+      gap: 2.5rem 1rem;
+    }
+    .rack__open {
+      padding-inline: 0;
+    }
+    .rack__line {
+      display: none;
+    }
+    .rack__meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .rack__meta .tag {
+      white-space: normal;
+    }
+    .try__row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  const rack = document.querySelector<HTMLElement>('[data-rack]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-try]');
+  if (rack && dialog) {
+    const items = [...rack.querySelectorAll<HTMLElement>('.rack__item')];
+    const filterBtns = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const opens = [...rack.querySelectorAll<HTMLButtonElement>('[data-open]')];
+
+    // Filters
+    filterBtns.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.filter;
+        filterBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        items.forEach((li) => (li.hidden = key !== 'all' && li.dataset.pace !== key));
+      }),
+    );
+
+    // Try-on preview
+    const svg = dialog.querySelector<SVGSVGElement>('.garment')!;
+    const print = svg.querySelector<SVGImageElement>('.garment__print')!;
+    const $ = <T extends Element>(s: string) => dialog.querySelector<T>(s)!;
+    const nameEl = $<HTMLElement>('[data-try-name]');
+    const noEl = $<HTMLElement>('[data-try-no]');
+    const paceEl = $<HTMLElement>('[data-try-pace]');
+    const lineEl = $<HTMLElement>('[data-try-line]');
+    const colorName = $<HTMLElement>('[data-try-color-name]');
+    const designField = $<HTMLInputElement>('[data-try-design]');
+    let current = 0;
+    let opener: HTMLElement | null = null;
+
+    const visible = () => opens.filter((b) => !b.closest<HTMLElement>('.rack__item')!.hidden);
+
+    const setColor = (key: string) => {
+      const input = dialog.querySelector<HTMLInputElement>(`input[name="color"][value="${key}"]`);
+      if (!input) return;
+      input.checked = true;
+      svg.style.setProperty('--garment', input.dataset.hex!);
+      colorName.textContent = input.dataset.label!;
+    };
+
+    const load = (btn: HTMLButtonElement) => {
+      const d = btn.dataset;
+      current = opens.indexOf(btn);
+      print.setAttribute('href', d.print!);
+      svg.setAttribute('aria-label', `Preview: ${d.alt}`);
+      nameEl.textContent = d.name!;
+      noEl.textContent = `No. ${d.no}`;
+      paceEl.textContent = d.paceLabel!;
+      lineEl.textContent = d.line!;
+      designField.value = `No. ${d.no} ${d.name}`;
+      setColor(d.color!);
+      if (location.hash !== `#${d.open}`) history.replaceState(null, '', `#${d.open}`);
+    };
+
+    const open = (btn: HTMLButtonElement) => {
+      opener = btn;
+      load(btn);
+      if (!dialog.open) dialog.showModal();
+    };
+
+    opens.forEach((btn) => btn.addEventListener('click', () => open(btn)));
+    dialog.querySelectorAll<HTMLInputElement>('input[name="cut"]').forEach((r) =>
+      r.addEventListener('change', () => svg.setAttribute('data-cut', r.value)),
+    );
+    dialog.querySelectorAll<HTMLInputElement>('input[name="color"]').forEach((r) =>
+      r.addEventListener('change', () => setColor(r.value)),
+    );
+    dialog.querySelectorAll<HTMLButtonElement>('[data-try-step]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const list = visible();
+        const pos = list.indexOf(opens[current]);
+        const next = list[(pos + Number(b.dataset.tryStep) + list.length) % list.length];
+        load(next);
+      }),
+    );
+    $<HTMLButtonElement>('[data-try-close]').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      history.replaceState(null, '', location.pathname);
+      opener?.focus();
+    });
+
+    // Deep links like /shop#03-motorcycle open that design.
+    const fromHash = () => {
+      const slug = decodeURIComponent(location.hash.slice(1));
+      const btn = opens.find((b) => b.dataset.open === slug);
+      if (btn) open(btn);
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
+  }
+</script>

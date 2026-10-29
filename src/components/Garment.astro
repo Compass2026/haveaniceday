@@ -1,0 +1,86 @@
+---
+// A flat garment drawing with a design printed on the chest. Used for the
+// shop grid and the try-on preview. Colour and cut are driven by CSS
+// custom properties / data attributes so the preview can switch them live.
+interface Props {
+  art: string; // image URL
+  color?: string;
+  cut?: 'tee' | 'crew';
+  label?: string;
+  class?: string;
+}
+const { art, color = '#f1ebdd', cut = 'tee', label, class: cls } = Astro.props;
+---
+
+<svg
+  class:list={['garment', cls]}
+  viewBox="0 0 400 440"
+  data-cut={cut}
+  style={`--garment:${color}`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <g class="garment__tee">
+    <path
+      class="garment__body"
+      d="M140 24 Q200 70 260 24 L332 46 L394 130 L350 162 L318 132 L322 420 Q200 434 78 420 L82 132 L50 162 L6 130 L68 46 Z"
+    ></path>
+    <path class="garment__fold" d="M82 132 Q90 260 84 410 M318 132 Q310 260 316 410 M332 46 Q322 92 318 132 M68 46 Q78 92 82 132"></path>
+  </g>
+  <g class="garment__crew">
+    <path
+      class="garment__body"
+      d="M140 24 Q200 70 260 24 L334 44 Q372 70 384 140 L398 368 L354 376 L326 172 L322 400 L78 400 L74 172 L46 376 L2 368 L16 140 Q28 70 66 44 Z"
+    ></path>
+    <path class="garment__rib" d="M78 400 H322 V426 H78 Z M354 376 L398 368 L400 392 L356 400 Z M46 376 L2 368 L0 392 L44 400 Z"></path>
+    <path class="garment__fold" d="M74 172 Q82 280 78 396 M326 172 Q318 280 322 396 M334 44 Q320 110 326 172 M66 44 Q80 110 74 172"></path>
+  </g>
+  <path class="garment__neck" d="M150 27 Q200 60 250 27 Q200 42 150 27 Z"></path>
+  <path class="garment__collar" d="M136 22 Q200 78 264 22"></path>
+  <image class="garment__print" href={art} x="113" y="88" width="174" height="196" preserveAspectRatio="xMidYMin meet"
+  ></image>
+</svg>
+
+<style>
+  .garment {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .garment__body {
+    fill: var(--garment);
+    stroke: rgb(13 27 61 / 0.22);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    transition: fill 0.35s ease;
+  }
+  .garment__rib {
+    fill: var(--garment);
+    stroke: rgb(13 27 61 / 0.22);
+    stroke-width: 2;
+    filter: brightness(0.94);
+    transition: fill 0.35s ease;
+  }
+  .garment__fold {
+    fill: none;
+    stroke: rgb(13 27 61 / 0.07);
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+  .garment__neck {
+    fill: rgb(13 27 61 / 0.18);
+  }
+  .garment__collar {
+    fill: none;
+    stroke: var(--garment);
+    stroke-width: 11;
+    stroke-linecap: round;
+    filter: brightness(0.9);
+    transition: stroke 0.35s ease;
+  }
+  .garment[data-cut='tee'] .garment__crew,
+  .garment[data-cut='crew'] .garment__tee {
+    display: none;
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+import { Image } from 'astro:assets';
+import { bySlug } from '../data/moments';
+const peace = bySlug('02-peace-sign');
+const ron = bySlug('08-ron-and-handy');
+const side = ron ?? peace;
+---
+
+<section class="ron section" id="story" aria-labelledby="ron-title">
+  <div class="wrap ron__grid">
+    <div class="ron__head">
+      <p class="eyebrow">Where it started</p>
+      <h2 class="h-lg" id="ron-title">A note from <span class="say">Ron</span></h2>
+    </div>
+
+    <figure class="ron__letter">
+      <span class="tape" style="left:-18px; top:-12px; transform:rotate(-14deg)"></span>
+      <span class="tape tape--blue" style="right:-14px; top:-10px; transform:rotate(11deg)"></span>
+      <blockquote>
+        <p>Hi, I’m Ron LaBeau, founder of Had A Nice Day.</p>
+        <p>
+          We’ve all said, ‘Have a nice day.’ But I wanted to celebrate the moments that let us say, <span
+            class="scribble"
+            >‘I had a nice day.’<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"
+              ><path d="M2 8 C 40 2, 80 11, 120 6 S 180 3, 198 7"></path></svg
+            ></span
+          >
+        </p>
+        <p>
+          Maybe it was a motorcycle ride, a hike, or baking cookies with your family. Through our apparel and podcast,
+          we’re building a community around those moments, and encouraging people to make more of them.
+        </p>
+      </blockquote>
+      <figcaption class="ron__sign">
+        <span class="ron__name">Ron LaBeau</span>
+        <span class="ron__role">Founder, Had A Nice Day</span>
+      </figcaption>
+    </figure>
+
+    {
+      side && (
+        <div class="ron__side">
+          <Image
+            class="sticker ron__handy"
+            src={side.image!}
+            alt={side.alt}
+            widths={[320, 560, 800]}
+            sizes="(max-width: 860px) 60vw, 26vw"
+            format="webp"
+            loading="lazy"
+          />
+          <p class="ron__aside">
+            <span class="say">Say hi to HANDY.</span> He turns up wherever somebody is having a good one.
+          </p>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .ron {
+    position: relative;
+    padding-top: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+  .ron__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 2.5rem clamp(1rem, 3vw, 3rem);
+    align-items: start;
+  }
+  .ron__head {
+    grid-column: 1 / span 12;
+    display: grid;
+    gap: 1rem;
+  }
+  .ron__letter {
+    grid-column: 1 / span 8;
+    position: relative;
+    margin: 0;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+    background: var(--paper-3);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 24px 50px -24px rgb(13 27 61 / 0.35);
+    transform: rotate(-0.8deg);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(2.1rem - 1px),
+      rgb(26 107 230 / 0.09) calc(2.1rem - 1px),
+      rgb(26 107 230 / 0.09) 2.1rem
+    );
+    background-position: 0 1.4rem;
+  }
+  .ron__letter blockquote {
+    margin: 0;
+    display: grid;
+    gap: 1.1rem;
+    font-family: var(--serif);
+    font-size: clamp(1.45rem, 1.1rem + 1.2vw, 2.1rem);
+    line-height: 1.32;
+    color: var(--ink);
+  }
+  .ron__letter blockquote p:first-child {
+    font-size: 1.12em;
+  }
+  .ron__sign {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--line-strong);
+  }
+  .ron__name {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 2.4rem;
+    line-height: 1;
+    color: var(--blue-ink);
+  }
+  .ron__role {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .ron__side {
+    grid-column: 9 / span 4;
+    display: grid;
+    gap: 1.25rem;
+    justify-items: center;
+    padding-top: clamp(0rem, 4vw, 4rem);
+  }
+  .ron__handy {
+    width: min(100%, 340px);
+    --tilt: 4deg;
+  }
+  .ron__side:hover .ron__handy {
+    --tilt: -3deg;
+  }
+  .ron__aside {
+    max-width: 18em;
+    text-align: center;
+    color: var(--ink-2);
+  }
+  .ron__aside .say {
+    display: block;
+    font-size: 1.6rem;
+    color: var(--ink);
+  }
+  @media (max-width: 860px) {
+    .ron__letter,
+    .ron__side {
+      grid-column: 1 / -1;
+    }
+    .ron__side {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+      align-items: center;
+      justify-items: start;
+      padding-top: 0;
+    }
+    .ron__aside {
+      text-align: left;
+    }
+  }
+</style>
