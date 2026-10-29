@@ -14,8 +14,8 @@ const side = ron ?? peace;
     </div>
 
     <figure class="ron__letter">
-      <span class="tape" style="left:-18px; top:-12px; transform:rotate(-14deg)"></span>
-      <span class="tape tape--blue" style="right:-14px; top:-10px; transform:rotate(11deg)"></span>
+      <span class="tape ron__tape ron__tape--l"></span>
+      <span class="tape tape--blue ron__tape ron__tape--r"></span>
       <blockquote>
         <p>Hi, I’m Ron LaBeau, founder of Had A Nice Day.</p>
         <p>
@@ -93,6 +93,16 @@ const side = ron ?? peace;
     );
     background-position: 0 1.4rem;
   }
+  .ron__tape--l {
+    left: -18px;
+    top: -12px;
+    transform: rotate(-14deg);
+  }
+  .ron__tape--r {
+    right: -14px;
+    top: -10px;
+    transform: rotate(11deg);
+  }
   .ron__letter blockquote {
     margin: 0;
     display: grid;
@@ -149,6 +159,16 @@ const side = ron ?? peace;
     color: var(--ink);
   }
   @media (max-width: 860px) {
+    /* Keep the tape inside the side margin on phones */
+    .ron__tape {
+      width: 96px;
+    }
+    .ron__tape--l {
+      left: -6px;
+    }
+    .ron__tape--r {
+      right: -4px;
+    }
     .ron__letter,
     .ron__side {
       grid-column: 1 / -1;

@@ -165,6 +165,14 @@ ol {
   padding-block: var(--section);
 }
 
+/* Decorations (tape, stamps, tilted stickers) may hang past a section's
+   edge. Clip them per section: on phones, overflow on body alone does not
+   stop the layout viewport from widening and zooming the page out.
+   `clip` (unlike `hidden`) keeps position: sticky working inside. */
+main > section {
+  overflow-x: clip;
+}
+
 .night {
   background: var(--night);
   color: var(--on-night);
