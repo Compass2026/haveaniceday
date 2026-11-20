@@ -23,7 +23,7 @@ const topics = [
   },
 ];
 const onAir = bySlug('10-podcast');
-const ronHandy = bySlug('08-ron-and-handy');
+const handy = bySlug('02-peace-sign');
 const listen = site.listen;
 const live = listen.filter((l) => l.href);
 ---
@@ -43,7 +43,7 @@ const live = listen.filter((l) => l.href);
         </h1>
         <p class="lede">
           Conversations about the days people remember and how they made room for them. Riders, golfers, bakers,
-          runners, neighbors. Everybody has a nice day worth telling, and Ron wants to hear it.
+          runners, neighbors. Everybody has a nice day worth telling, and we want to hear it.
         </p>
         <div class="pod-hero__ctas">
           <a class="btn btn--orange" href="#be-a-guest">Be a guest</a>
@@ -135,17 +135,17 @@ const live = listen.filter((l) => l.href);
     <div class="wrap guest__grid">
       <div class="guest__copy">
         <p class="eyebrow">Be a guest</p>
-        <h2 class="h-lg" id="guest-title">Had a nice day? <span class="say">Come tell Ron about it.</span></h2>
+        <h2 class="h-lg" id="guest-title">Had a nice day? <span class="say">Come tell us about it.</span></h2>
         <p class="lede">
           You don’t need a big adventure or a microphone. You need one good day and the story behind it. Tell us a little,
           and if it’s a fit for the show, we’ll reach out.
         </p>
         {
-          (onAir ?? ronHandy) && (
+          (onAir ?? handy) && (
             <Image
               class="sticker guest__art"
-              src={(onAir ?? ronHandy)!.image!}
-              alt={(onAir ?? ronHandy)!.alt}
+              src={(onAir ?? handy)!.image!}
+              alt={(onAir ?? handy)!.alt}
               widths={[320, 560]}
               sizes="280px"
               format="webp"
@@ -183,7 +183,7 @@ const live = listen.filter((l) => l.href);
           <input type="checkbox" name="consent" id="guest-consent" required />
           <span>It’s okay to contact me about being on the show.</span>
         </label>
-        <button class="btn" type="submit">Send it to Ron</button>
+        <button class="btn" type="submit">Send it to us</button>
         <FormNote ok="Thanks for sharing. We read every one, and we’ll be in touch if it’s a fit." />
       </form>
     </div>

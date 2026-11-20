@@ -139,7 +139,7 @@ const raw: Omit<Moment, 'image' | 'complete'>[] = [
     pace: 'signature',
     phrase: 'with Ron.',
     line: 'The founder and his sidekick.',
-    alt: 'Ron LaBeau with HANDY.',
+    alt: 'Ron LaBeau in a plaid shirt and ball cap, holding an iced coffee, with his arm around HANDY, who is flashing a peace sign.',
   },
 ];
 
