@@ -45,7 +45,7 @@ Supplied folder: 12 PNGs. Seven were downloaded and inspected byte by byte; five
 | 11_Jogging_print.png | 3600×4500, 300 dpi | OK | |
 | 01_Tree_cutting_print.png | 7.8 MB | Not retrieved | The Drive connector returns at most about 7 MB per file. |
 | 07_Rodeo_print.png | 14.2 MB | Not retrieved | Over the connector's 10 MB limit. |
-| 08_Ron_and_HANDY_print.png | 8.9 MB | Not retrieved | Connector size limit. |
+| 08_Ron_and_HANDY_print.png | 1121×1403, RGBA | OK, **web size** | Supplied by Ron by email (1.4 MB) and shown beside his note. Fine for the web. The 8.9 MB Drive original is the one to use for print. |
 | 10_Podcast_print.png | 7.6 MB | Not retrieved | Connector size limit. |
 | 12_Baking_cookies_print.png | 7.5 MB | Not retrieved | Connector size limit. |
 
@@ -54,4 +54,4 @@ General notes:
 - Every print file uses alpha 253 to 254 (about 99% opaque) across the artwork instead of 255. It is invisible on screen, but mention it to the print shop: some DTG workflows treat partial alpha differently.
 - The mascot's name, **HANDY**, comes from the file name `08_Ron_and_HANDY_print.png`. Please confirm the spelling and capitalization.
 - These are illustrations, not a merchandise catalog. The shop shows garment previews and a "first drop in the works" status, with no prices, sizes or stock claims.
-- The five missing designs are already written into `src/data/moments.ts` with names, times and copy. Drop the files into `assets/source/`, run `npm run art`, and they appear across the site. Baking cookies takes 5:45 PM in the day timeline and becomes the "Close to home" image on the podcast page.
+- The four missing designs are already written into `src/data/moments.ts` with names, times and copy. Drop the files into `assets/source/`, run `npm run art`, and they appear across the site. Baking cookies takes 5:45 PM in the day timeline and becomes the "Close to home" image on the podcast page.

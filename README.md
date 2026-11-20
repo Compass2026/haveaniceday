@@ -34,7 +34,7 @@ npm run check:copy  # brand voice guard: fails on em dashes
 
 **Adding a design:** copy the PNG into `assets/source/` using its Drive file name (for example `12_Baking_cookies_print.png`), run `npm run art`, then `npm run build`. Every design is already described in `src/data/moments.ts` (name, time of day, copy), so it shows up in the hero, the day timeline, the shop and the card maker with no other changes.
 
-Five supplied files aren't in the repo yet (see `docs/creative-and-assets.md`): `01_Tree_cutting`, `07_Rodeo`, `08_Ron_and_HANDY`, `10_Podcast`, `12_Baking_cookies`.
+Four supplied files aren't in the repo yet (see `docs/creative-and-assets.md`): `01_Tree_cutting`, `07_Rodeo`, `10_Podcast`, `12_Baking_cookies`.
 
 ## Configuration to finish before launch
 
