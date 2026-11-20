@@ -52,6 +52,6 @@ Supplied folder: 12 PNGs. Seven were downloaded and inspected byte by byte; five
 General notes:
 
 - Every print file uses alpha 253 to 254 (about 99% opaque) across the artwork instead of 255. It is invisible on screen, but mention it to the print shop: some DTG workflows treat partial alpha differently.
-- The mascot's name, **HANDY**, comes from the file name `08_Ron_and_HANDY_print.png`. Please confirm the spelling and capitalization.
+- The mascot's name, **HANDY**, is confirmed by the client (it came from the file name `08_Ron_and_HANDY_print.png`). Note that the shirt in that artwork reads "HAND", the brand's initials, not the mascot's name.
 - These are illustrations, not a merchandise catalog. The shop shows garment previews and a "first drop in the works" status, with no prices, sizes or stock claims.
 - The four missing designs are already written into `src/data/moments.ts` with names, times and copy. Drop the files into `assets/source/`, run `npm run art`, and they appear across the site. Baking cookies takes 5:45 PM in the day timeline and becomes the "Close to home" image on the podcast page.
